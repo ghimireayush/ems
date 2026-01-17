@@ -1,0 +1,992 @@
+openapi: 3.0.3
+info:
+  title: Nepal Elections 2026 API
+  description: |
+    API for the Nepal Elections 2026 citizen event platform.
+    
+    ## Overview
+    This API enables:
+    - Citizens to discover political events near them
+    - Filtering by constituency, party, event type, and date
+    - RSVP to events
+    - Geo-proximity queries
+    
+    ## Authentication
+    - Public endpoints: No auth required (read-only)
+    - Citizen endpoints: JWT Bearer token
+    - Party admin endpoints: JWT with party_admin role
+    
+    ## Rate Limits
+    - Public: 100 requests/minute
+    - Authenticated: 500 requests/minute
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: api@nepalelections2026.np
+
+servers:
+  - url: https://api.nepalelections2026.np/v1
+    description: Production
+  - url: https://staging-api.nepalelections2026.np/v1
+    description: Staging
+  - url: http://localhost:3000/v1
+    description: Local development
+
+tags:
+  - name: Events
+    description: Political event operations
+  - name: Parties
+    description: Political party data
+  - name: Constituencies
+    description: Electoral constituency data
+  - name: Auth
+    description: Authentication endpoints
+  - name: Users
+    description: User management
+
+paths:
+  # ============================================================================
+  # EVENTS
+  # ============================================================================
+  /events:
+    get:
+      tags: [Events]
+      summary: List events
+      description: |
+        Returns a paginated list of events with optional filtering.
+        Results are enriched with party and constituency details.
+      operationId: listEvents
+      parameters:
+        - name: constituency_id
+          in: query
+          schema:
+            type: string
+          description: Filter by constituency ID
+          example: ktm-1
+        - name: party_id
+          in: query
+          schema:
+            type: string
+          description: Filter by party ID
+          example: nc
+        - name: event_type
+          in: query
+          schema:
+            $ref: '#/components/schemas/EventType'
+          description: Filter by event type
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/EventStatus'
+          description: Filter by status
+          default: confirmed
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Events on or after this date
+          example: "2026-02-15"
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Events on or before this date
+          example: "2026-03-05"
+        - name: tags
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          description: Filter by tags (OR logic)
+          example: [youth, economy]
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Full-text search in title, description, venue
+          example: rally kathmandu
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [datetime, -datetime, rsvp_count, -rsvp_count]
+          default: datetime
+          description: Sort field (prefix with - for descending)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Paginated list of events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /events/nearby:
+    get:
+      tags: [Events]
+      summary: Find events near a location
+      description: Returns events within a radius of the given coordinates, sorted by distance.
+      operationId: listEventsNearby
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Latitude
+          example: 27.7172
+        - name: lng
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Longitude
+          example: 85.3240
+        - name: radius
+          in: query
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 50000
+            default: 5000
+          description: Search radius in meters
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Events sorted by distance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NearbyEventsResponse'
+
+  /events/{id}:
+    get:
+      tags: [Events]
+      summary: Get event details
+      operationId: getEvent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: evt-001
+      responses:
+        '200':
+          description: Event details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /events/{id}/rsvp:
+    post:
+      tags: [Events]
+      summary: RSVP to an event
+      operationId: rsvpEvent
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [going, interested, not_going]
+                  default: going
+      responses:
+        '200':
+          description: RSVP recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RsvpResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    delete:
+      tags: [Events]
+      summary: Cancel RSVP
+      operationId: cancelRsvp
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: RSVP cancelled
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============================================================================
+  # PARTIES
+  # ============================================================================
+  /parties:
+    get:
+      tags: [Parties]
+      summary: List all parties
+      operationId: listParties
+      responses:
+        '200':
+          description: List of political parties
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Party'
+
+  /parties/{id}:
+    get:
+      tags: [Parties]
+      summary: Get party details
+      operationId: getParty
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: nc
+      responses:
+        '200':
+          description: Party details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Party'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /parties/{id}/events:
+    get:
+      tags: [Parties, Events]
+      summary: List events by party
+      operationId: listPartyEvents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Party's events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventListResponse'
+
+  # ============================================================================
+  # CONSTITUENCIES
+  # ============================================================================
+  /constituencies:
+    get:
+      tags: [Constituencies]
+      summary: List all constituencies
+      operationId: listConstituencies
+      parameters:
+        - name: province
+          in: query
+          schema:
+            type: string
+          description: Filter by province
+        - name: district
+          in: query
+          schema:
+            type: string
+          description: Filter by district
+      responses:
+        '200':
+          description: List of constituencies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Constituency'
+
+  /constituencies/{id}:
+    get:
+      tags: [Constituencies]
+      summary: Get constituency details
+      operationId: getConstituency
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: ktm-1
+      responses:
+        '200':
+          description: Constituency details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Constituency'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /constituencies/detect:
+    get:
+      tags: [Constituencies]
+      summary: Detect constituency from coordinates
+      operationId: detectConstituency
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+          example: 27.7172
+        - name: lng
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+          example: 85.3240
+      responses:
+        '200':
+          description: Detected constituency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Constituency'
+        '404':
+          description: No constituency found for coordinates
+
+  /constituencies/{id}/events:
+    get:
+      tags: [Constituencies, Events]
+      summary: List events in constituency
+      operationId: listConstituencyEvents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Constituency's events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventListResponse'
+
+  # ============================================================================
+  # AUTH
+  # ============================================================================
+  /auth/request-otp:
+    post:
+      tags: [Auth]
+      summary: Request OTP for phone login
+      operationId: requestOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone:
+                  type: string
+                  description: Phone number with country code
+                  example: "+9779812345678"
+      responses:
+        '200':
+          description: OTP sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "OTP sent to +977981****678"
+                  expires_in:
+                    type: integer
+                    description: OTP validity in seconds
+                    example: 300
+        '429':
+          description: Too many requests
+
+  /auth/verify-otp:
+    post:
+      tags: [Auth]
+      summary: Verify OTP and get token
+      operationId: verifyOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, otp]
+              properties:
+                phone:
+                  type: string
+                  example: "+9779812345678"
+                otp:
+                  type: string
+                  example: "123456"
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid OTP
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: New tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid refresh token
+
+  # ============================================================================
+  # USERS
+  # ============================================================================
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Get current user profile
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    
+    patch:
+      tags: [Users]
+      summary: Update current user profile
+      operationId: updateCurrentUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                constituency_id:
+                  type: string
+                location:
+                  $ref: '#/components/schemas/Coordinates'
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/rsvps:
+    get:
+      tags: [Users, Events]
+      summary: Get user's RSVPs
+      operationId: getUserRsvps
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [going, interested, not_going]
+        - name: upcoming_only
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: User's RSVPd events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============================================================================
+  # METADATA
+  # ============================================================================
+  /meta/event-types:
+    get:
+      tags: [Events]
+      summary: Get event type definitions
+      operationId: getEventTypes
+      responses:
+        '200':
+          description: Event types with labels
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    labelNepali:
+                      type: string
+                    icon:
+                      type: string
+              example:
+                rally:
+                  label: "Rally"
+                  labelNepali: "र्‍याली"
+                  icon: "megaphone"
+
+# ============================================================================
+# COMPONENTS
+# ============================================================================
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # --------------------------------------------------------------------------
+    # Core Entities
+    # --------------------------------------------------------------------------
+    Party:
+      type: object
+      properties:
+        id:
+          type: string
+          example: nc
+        name:
+          type: string
+          example: Nepali Congress
+        name_nepali:
+          type: string
+          example: नेपाली कांग्रेस
+        short_name:
+          type: string
+          example: NC
+        color:
+          type: string
+          example: "#1e88e5"
+        ideology:
+          type: string
+          example: Center-left, Social Democracy
+        leader:
+          type: string
+          example: Sher Bahadur Deuba
+        founded:
+          type: integer
+          example: 1947
+        symbol:
+          type: string
+          example: tree
+        website:
+          type: string
+          format: uri
+          nullable: true
+
+    Constituency:
+      type: object
+      properties:
+        id:
+          type: string
+          example: ktm-1
+        name:
+          type: string
+          example: Kathmandu-1
+        name_nepali:
+          type: string
+          example: काठमाडौं-१
+        province:
+          type: string
+          example: Bagmati
+        district:
+          type: string
+          example: Kathmandu
+        type:
+          type: string
+          enum: [FPTP, PR]
+          example: FPTP
+        registered_voters:
+          type: integer
+          example: 89234
+        center:
+          $ref: '#/components/schemas/Coordinates'
+        bounds:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coordinates'
+          description: Polygon coordinates
+
+    Venue:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Basantapur Durbar Square
+        name_nepali:
+          type: string
+          example: बसन्तपुर दरबार क्षेत्र
+        address:
+          type: string
+          example: Basantapur, Kathmandu
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          example: evt-001
+        title:
+          type: string
+          example: "NC Rally: Vision for Kathmandu"
+        title_nepali:
+          type: string
+        party_id:
+          type: string
+          nullable: true
+        constituency_id:
+          type: string
+        event_type:
+          $ref: '#/components/schemas/EventType'
+        status:
+          $ref: '#/components/schemas/EventStatus'
+        venue:
+          $ref: '#/components/schemas/Venue'
+        datetime:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        description:
+          type: string
+        speakers:
+          type: array
+          items:
+            type: string
+        expected_attendance:
+          type: integer
+        rsvp_count:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+
+    EventFull:
+      allOf:
+        - $ref: '#/components/schemas/Event'
+        - type: object
+          properties:
+            party:
+              $ref: '#/components/schemas/Party'
+            constituency:
+              $ref: '#/components/schemas/Constituency'
+            user_rsvp:
+              type: string
+              enum: [going, interested, not_going]
+              nullable: true
+              description: Current user's RSVP status (if authenticated)
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        phone:
+          type: string
+        name:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum: [citizen, party_admin, super_admin]
+        constituency_id:
+          type: string
+          nullable: true
+        constituency:
+          $ref: '#/components/schemas/Constituency'
+        created_at:
+          type: string
+          format: date-time
+
+    # --------------------------------------------------------------------------
+    # Enums
+    # --------------------------------------------------------------------------
+    EventType:
+      type: string
+      enum: [rally, townhall, march, meeting, assembly, canvassing, conference, debate]
+
+    EventStatus:
+      type: string
+      enum: [draft, confirmed, cancelled, completed]
+
+    # --------------------------------------------------------------------------
+    # Common Types
+    # --------------------------------------------------------------------------
+    Coordinates:
+      type: object
+      properties:
+        lat:
+          type: number
+          format: float
+          example: 27.7172
+        lng:
+          type: number
+          format: float
+          example: 85.3240
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        per_page:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 150
+        total_pages:
+          type: integer
+          example: 8
+
+    # --------------------------------------------------------------------------
+    # Responses
+    # --------------------------------------------------------------------------
+    EventListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventFull'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    NearbyEventsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/EventFull'
+              - type: object
+                properties:
+                  distance_meters:
+                    type: number
+                    format: float
+                    description: Distance from query point in meters
+        center:
+          $ref: '#/components/schemas/Coordinates'
+        radius_meters:
+          type: integer
+
+    RsvpResponse:
+      type: object
+      properties:
+        event_id:
+          type: string
+        status:
+          type: string
+          enum: [going, interested, not_going]
+        rsvp_count:
+          type: integer
+          description: Updated total RSVP count
+
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+          description: Access token validity in seconds
+        user:
+          $ref: '#/components/schemas/User'
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "INVALID_PARAMS"
+            message: "Invalid date format"
+    
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "UNAUTHORIZED"
+            message: "Invalid or expired token"
+    
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "Event not found"

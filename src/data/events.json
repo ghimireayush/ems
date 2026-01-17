@@ -1,0 +1,234 @@
+{
+  "events": [
+    {
+      "id": "evt-001",
+      "title": "NC Rally: Vision for Kathmandu",
+      "titleNepali": "नेकां र्‍याली: काठमाडौंको दृष्टिकोण",
+      "partyId": "nc",
+      "constituencyId": "ktm-1",
+      "type": "rally",
+      "venue": {
+        "name": "Basantapur Durbar Square",
+        "nameNepali": "बसन्तपुर दरबार क्षेत्र",
+        "address": "Basantapur, Kathmandu",
+        "coordinates": [27.7042, 85.3066]
+      },
+      "datetime": "2026-02-15T14:00:00+05:45",
+      "endTime": "2026-02-15T17:00:00+05:45",
+      "speakers": ["Sher Bahadur Deuba", "Gagan Thapa"],
+      "description": "Major rally addressing youth employment and urban development",
+      "expectedAttendance": 5000,
+      "rsvpCount": 1234,
+      "status": "confirmed",
+      "tags": ["youth", "employment", "urban"]
+    },
+    {
+      "id": "evt-002",
+      "title": "UML Town Hall: Economic Policy",
+      "titleNepali": "एमाले टाउन हल: आर्थिक नीति",
+      "partyId": "uml",
+      "constituencyId": "ktm-2",
+      "type": "townhall",
+      "venue": {
+        "name": "Nepal Academy Hall",
+        "nameNepali": "नेपाल प्रज्ञा प्रतिष्ठान हल",
+        "address": "Kamaladi, Kathmandu",
+        "coordinates": [27.7089, 85.3200]
+      },
+      "datetime": "2026-02-16T10:00:00+05:45",
+      "endTime": "2026-02-16T13:00:00+05:45",
+      "speakers": ["K.P. Sharma Oli"],
+      "description": "Open discussion on economic reforms and foreign investment",
+      "expectedAttendance": 800,
+      "rsvpCount": 456,
+      "status": "confirmed",
+      "tags": ["economy", "investment", "policy"]
+    },
+    {
+      "id": "evt-003",
+      "title": "RSP Anti-Corruption March",
+      "titleNepali": "रास्वपा भ्रष्टाचार विरोधी मार्च",
+      "partyId": "rsp",
+      "constituencyId": "ktm-1",
+      "type": "march",
+      "venue": {
+        "name": "Ratna Park to Singha Durbar",
+        "nameNepali": "रत्न पार्कदेखि सिंहदरबार",
+        "address": "Ratna Park, Kathmandu",
+        "coordinates": [27.7050, 85.3150]
+      },
+      "datetime": "2026-02-17T11:00:00+05:45",
+      "endTime": "2026-02-17T14:00:00+05:45",
+      "speakers": ["Rabi Lamichhane"],
+      "description": "March demanding transparency and accountability from government",
+      "expectedAttendance": 3000,
+      "rsvpCount": 892,
+      "status": "confirmed",
+      "tags": ["corruption", "transparency", "accountability"]
+    },
+    {
+      "id": "evt-004",
+      "title": "Maoist Centre: Farmers Meet",
+      "titleNepali": "माओवादी केन्द्र: किसान भेला",
+      "partyId": "maoist",
+      "constituencyId": "bhaktapur-1",
+      "type": "meeting",
+      "venue": {
+        "name": "Bhaktapur Municipality Hall",
+        "nameNepali": "भक्तपुर नगरपालिका हल",
+        "address": "Durbar Square, Bhaktapur",
+        "coordinates": [27.6722, 85.4279]
+      },
+      "datetime": "2026-02-18T13:00:00+05:45",
+      "endTime": "2026-02-18T16:00:00+05:45",
+      "speakers": ["Pushpa Kamal Dahal", "Barsha Man Pun"],
+      "description": "Addressing agricultural policies and farmer subsidies",
+      "expectedAttendance": 1200,
+      "rsvpCount": 234,
+      "status": "confirmed",
+      "tags": ["agriculture", "farmers", "subsidies"]
+    },
+    {
+      "id": "evt-005",
+      "title": "GenZ Youth Assembly",
+      "titleNepali": "जेनजी युवा सभा",
+      "partyId": "genz",
+      "constituencyId": "lalitpur-1",
+      "type": "assembly",
+      "venue": {
+        "name": "Patan Durbar Square",
+        "nameNepali": "पाटन दरबार क्षेत्र",
+        "address": "Patan, Lalitpur",
+        "coordinates": [27.6727, 85.3250]
+      },
+      "datetime": "2026-02-19T15:00:00+05:45",
+      "endTime": "2026-02-19T18:00:00+05:45",
+      "speakers": ["Kishori Karki"],
+      "description": "Youth-led assembly on political reform and digital governance",
+      "expectedAttendance": 2500,
+      "rsvpCount": 1567,
+      "status": "confirmed",
+      "tags": ["youth", "reform", "digital"]
+    },
+    {
+      "id": "evt-006",
+      "title": "NC Door-to-Door Campaign",
+      "titleNepali": "नेकां घरदैलो अभियान",
+      "partyId": "nc",
+      "constituencyId": "ktm-3",
+      "type": "canvassing",
+      "venue": {
+        "name": "Kalimati Area",
+        "nameNepali": "कालीमाटी क्षेत्र",
+        "address": "Kalimati, Kathmandu",
+        "coordinates": [27.6950, 85.3020]
+      },
+      "datetime": "2026-02-20T09:00:00+05:45",
+      "endTime": "2026-02-20T17:00:00+05:45",
+      "speakers": [],
+      "description": "Volunteer canvassing in Kalimati neighborhoods",
+      "expectedAttendance": 200,
+      "rsvpCount": 78,
+      "status": "confirmed",
+      "tags": ["canvassing", "volunteers", "outreach"]
+    },
+    {
+      "id": "evt-007",
+      "title": "UML Women's Conference",
+      "titleNepali": "एमाले महिला सम्मेलन",
+      "partyId": "uml",
+      "constituencyId": "lalitpur-1",
+      "type": "conference",
+      "venue": {
+        "name": "Hotel Himalaya",
+        "nameNepali": "होटल हिमालय",
+        "address": "Kupandole, Lalitpur",
+        "coordinates": [27.6850, 85.3180]
+      },
+      "datetime": "2026-02-21T10:00:00+05:45",
+      "endTime": "2026-02-21T16:00:00+05:45",
+      "speakers": ["Bidya Devi Bhandari"],
+      "description": "Conference on women's political participation and rights",
+      "expectedAttendance": 500,
+      "rsvpCount": 312,
+      "status": "confirmed",
+      "tags": ["women", "rights", "participation"]
+    },
+    {
+      "id": "evt-008",
+      "title": "JSP Federal Rights Rally",
+      "titleNepali": "जसपा संघीय अधिकार र्‍याली",
+      "partyId": "jsp",
+      "constituencyId": "ktm-2",
+      "type": "rally",
+      "venue": {
+        "name": "Tundikhel Ground",
+        "nameNepali": "टुँडिखेल मैदान",
+        "address": "Tundikhel, Kathmandu",
+        "coordinates": [27.7020, 85.3160]
+      },
+      "datetime": "2026-02-22T14:00:00+05:45",
+      "endTime": "2026-02-22T17:00:00+05:45",
+      "speakers": ["Upendra Yadav"],
+      "description": "Rally demanding stronger federal rights and Madhesh representation",
+      "expectedAttendance": 4000,
+      "rsvpCount": 645,
+      "status": "confirmed",
+      "tags": ["federalism", "madhesh", "rights"]
+    },
+    {
+      "id": "evt-009",
+      "title": "RSP Candidate Introduction",
+      "titleNepali": "रास्वपा उम्मेदवार परिचय",
+      "partyId": "rsp",
+      "constituencyId": "bhaktapur-1",
+      "type": "meeting",
+      "venue": {
+        "name": "Dattatreya Square",
+        "nameNepali": "दत्तात्रय चोक",
+        "address": "Dattatreya, Bhaktapur",
+        "coordinates": [27.6715, 85.4350]
+      },
+      "datetime": "2026-02-23T11:00:00+05:45",
+      "endTime": "2026-02-23T13:00:00+05:45",
+      "speakers": [],
+      "description": "Meet the RSP candidate for Bhaktapur-1",
+      "expectedAttendance": 600,
+      "rsvpCount": 189,
+      "status": "confirmed",
+      "tags": ["candidate", "introduction", "local"]
+    },
+    {
+      "id": "evt-010",
+      "title": "Multi-Party Debate",
+      "titleNepali": "बहुदलीय वाद-विवाद",
+      "partyId": null,
+      "constituencyId": "ktm-1",
+      "type": "debate",
+      "venue": {
+        "name": "Nepal Tourism Board Auditorium",
+        "nameNepali": "नेपाल पर्यटन बोर्ड सभागृह",
+        "address": "Pradarshani Marg, Kathmandu",
+        "coordinates": [27.7000, 85.3250]
+      },
+      "datetime": "2026-02-25T18:00:00+05:45",
+      "endTime": "2026-02-25T21:00:00+05:45",
+      "speakers": ["Multiple Candidates"],
+      "description": "Live televised debate between Kathmandu-1 candidates",
+      "expectedAttendance": 400,
+      "rsvpCount": 398,
+      "status": "confirmed",
+      "tags": ["debate", "candidates", "televised"]
+    }
+  ],
+  "eventTypes": {
+    "rally": { "label": "Rally", "labelNepali": "र्‍याली", "icon": "megaphone" },
+    "townhall": { "label": "Town Hall", "labelNepali": "टाउन हल", "icon": "users" },
+    "march": { "label": "March", "labelNepali": "मार्च", "icon": "footprints" },
+    "meeting": { "label": "Meeting", "labelNepali": "भेला", "icon": "handshake" },
+    "assembly": { "label": "Assembly", "labelNepali": "सभा", "icon": "landmark" },
+    "canvassing": { "label": "Canvassing", "labelNepali": "घरदैलो", "icon": "door-open" },
+    "conference": { "label": "Conference", "labelNepali": "सम्मेलन", "icon": "presentation" },
+    "debate": { "label": "Debate", "labelNepali": "वाद-विवाद", "icon": "message-square" }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "parties": [
+    {
+      "id": "nc",
+      "name": "Nepali Congress",
+      "nameNepali": "नेपाली कांग्रेस",
+      "shortName": "NC",
+      "color": "#1e88e5",
+      "ideology": "Center-left, Social Democracy",
+      "leader": "Sher Bahadur Deuba",
+      "founded": 1947,
+      "symbol": "tree",
+      "website": "https://nepalicongress.org"
+    },
+    {
+      "id": "uml",
+      "name": "CPN (UML)",
+      "nameNepali": "नेकपा (एमाले)",
+      "shortName": "UML",
+      "color": "#d32f2f",
+      "ideology": "Left, Communist",
+      "leader": "K.P. Sharma Oli",
+      "founded": 1991,
+      "symbol": "sun",
+      "website": "https://cpnuml.org"
+    },
+    {
+      "id": "maoist",
+      "name": "CPN (Maoist Centre)",
+      "nameNepali": "नेकपा (माओवादी केन्द्र)",
+      "shortName": "Maoist",
+      "color": "#c62828",
+      "ideology": "Left, Maoist",
+      "leader": "Pushpa Kamal Dahal",
+      "founded": 1994,
+      "symbol": "hammer-sickle",
+      "website": null
+    },
+    {
+      "id": "rsp",
+      "name": "Rastriya Swatantra Party",
+      "nameNepali": "राष्ट्रिय स्वतन्त्र पार्टी",
+      "shortName": "RSP",
+      "color": "#7b1fa2",
+      "ideology": "Anti-corruption, Liberal",
+      "leader": "Rabi Lamichhane",
+      "founded": 2022,
+      "symbol": "key",
+      "website": null
+    },
+    {
+      "id": "jsp",
+      "name": "Janata Samajwadi Party",
+      "nameNepali": "जनता समाजवादी पार्टी",
+      "shortName": "JSP",
+      "color": "#388e3c",
+      "ideology": "Center-left, Federalist",
+      "leader": "Upendra Yadav",
+      "founded": 2020,
+      "symbol": "chair",
+      "website": null
+    },
+    {
+      "id": "genz",
+      "name": "Nawa Nirman Party",
+      "nameNepali": "नवनिर्माण पार्टी",
+      "shortName": "GenZ",
+      "color": "#00bcd4",
+      "ideology": "Youth, Anti-establishment",
+      "leader": "Kishori Karki",
+      "founded": 2025,
+      "symbol": "sunrise",
+      "website": null
+    }
+  ]
+}

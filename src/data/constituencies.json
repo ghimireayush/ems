@@ -1,0 +1,84 @@
+{
+  "constituencies": [
+    {
+      "id": "ktm-1",
+      "name": "Kathmandu-1",
+      "nameNepali": "काठमाडौं-१",
+      "province": "Bagmati",
+      "district": "Kathmandu",
+      "type": "FPTP",
+      "registeredVoters": 89234,
+      "center": [27.7172, 85.3240],
+      "bounds": [
+        [27.7050, 85.3100],
+        [27.7050, 85.3380],
+        [27.7290, 85.3380],
+        [27.7290, 85.3100]
+      ]
+    },
+    {
+      "id": "ktm-2",
+      "name": "Kathmandu-2",
+      "nameNepali": "काठमाडौं-२",
+      "province": "Bagmati",
+      "district": "Kathmandu",
+      "type": "FPTP",
+      "registeredVoters": 76543,
+      "center": [27.7000, 85.3500],
+      "bounds": [
+        [27.6850, 85.3380],
+        [27.6850, 85.3620],
+        [27.7150, 85.3620],
+        [27.7150, 85.3380]
+      ]
+    },
+    {
+      "id": "ktm-3",
+      "name": "Kathmandu-3",
+      "nameNepali": "काठमाडौं-३",
+      "province": "Bagmati",
+      "district": "Kathmandu",
+      "type": "FPTP",
+      "registeredVoters": 82100,
+      "center": [27.6850, 85.3150],
+      "bounds": [
+        [27.6700, 85.3000],
+        [27.6700, 85.3300],
+        [27.7000, 85.3300],
+        [27.7000, 85.3000]
+      ]
+    },
+    {
+      "id": "lalitpur-1",
+      "name": "Lalitpur-1",
+      "nameNepali": "ललितपुर-१",
+      "province": "Bagmati",
+      "district": "Lalitpur",
+      "type": "FPTP",
+      "registeredVoters": 71234,
+      "center": [27.6588, 85.3247],
+      "bounds": [
+        [27.6450, 85.3100],
+        [27.6450, 85.3400],
+        [27.6720, 85.3400],
+        [27.6720, 85.3100]
+      ]
+    },
+    {
+      "id": "bhaktapur-1",
+      "name": "Bhaktapur-1",
+      "nameNepali": "भक्तपुर-१",
+      "province": "Bagmati",
+      "district": "Bhaktapur",
+      "type": "FPTP",
+      "registeredVoters": 65890,
+      "center": [27.6710, 85.4298],
+      "bounds": [
+        [27.6550, 85.4100],
+        [27.6550, 85.4500],
+        [27.6870, 85.4500],
+        [27.6870, 85.4100]
+      ]
+    }
+  ]
+}
