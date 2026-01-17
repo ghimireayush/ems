@@ -94,7 +94,9 @@ function AppContent() {
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     }}>
       {/* Header */}
-      <header style={{
+      <header 
+        data-testid="header"
+        style={{
         padding: '12px 16px',
         background: '#1976d2',
         color: 'white',
@@ -121,6 +123,7 @@ function AppContent() {
             <UserMenu user={user} onLogout={handleLogout} />
           ) : (
             <button
+              data-testid="login-button"
               onClick={() => setShowLogin(true)}
               style={{
                 padding: '8px 16px',
@@ -149,7 +152,9 @@ function AppContent() {
         overflow: 'hidden',
       }}>
         {/* Left panel - List/Detail */}
-        <div style={{
+        <div 
+          data-testid="left-panel"
+          style={{
           width: 380,
           borderRight: '1px solid #e0e0e0',
           display: 'flex',
@@ -227,11 +232,13 @@ function AppContent() {
       </footer>
 
       {/* Login Modal */}
-      <LoginModal 
-        isOpen={showLogin} 
-        onClose={() => setShowLogin(false)}
-        onLogin={handleLogin}
-      />
+      <div data-testid="login-modal-container">
+        <LoginModal 
+          isOpen={showLogin} 
+          onClose={() => setShowLogin(false)}
+          onLogin={handleLogin}
+        />
+      </div>
     </div>
   );
 }

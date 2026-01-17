@@ -33,7 +33,7 @@ export function EventList() {
     : null;
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }} data-testid="event-list">
       {/* Search and filters */}
       <div style={{ padding: 12, borderBottom: '1px solid #e0e0e0' }}>
         <input
@@ -136,6 +136,7 @@ export function EventList() {
 function EventCard({ event, isSelected, onSelect, showDistance }) {
   return (
     <div
+      data-testid={`event-item-${event.id}`}
       onClick={onSelect}
       style={{
         padding: 12,

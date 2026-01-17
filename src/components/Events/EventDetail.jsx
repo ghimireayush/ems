@@ -58,7 +58,7 @@ export function EventDetail({ user, onLoginRequired }) {
   };
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto' }}>
+    <div style={{ height: '100%', overflowY: 'auto' }} data-testid="event-detail">
       {/* Header */}
       <div style={{ 
         padding: 16, 
@@ -217,7 +217,7 @@ export function EventDetail({ user, onLoginRequired }) {
         <Section title="Attendance">
           <div style={{ display: 'flex', gap: 24 }}>
             <div>
-              <div style={{ fontSize: 24, fontWeight: 600 }}>{event.rsvpCount}</div>
+              <div style={{ fontSize: 24, fontWeight: 600 }} data-testid="rsvp-count">{event.rsvpCount}</div>
               <div style={{ fontSize: 12, color: '#666' }}>RSVPs</div>
             </div>
             <div>
@@ -258,6 +258,7 @@ export function EventDetail({ user, onLoginRequired }) {
           <button
             onClick={handleRsvp}
             disabled={event.userRsvp || rsvpLoading}
+            data-testid="rsvp-button"
             style={{
               width: '100%',
               padding: '12px 24px',

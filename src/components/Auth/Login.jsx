@@ -70,7 +70,7 @@ export function LoginModal({ isOpen, onClose, onLogin }) {
         width: 360,
         maxWidth: '90%',
         boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-      }}>
+      }} data-testid="login-modal">
         {/* Header */}
         <div style={{
           display: 'flex',
@@ -126,6 +126,7 @@ export function LoginModal({ isOpen, onClose, onLogin }) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+9779800000000"
+                data-testid="phone-input"
                 style={{
                   width: '100%',
                   padding: '12px 14px',
@@ -144,6 +145,7 @@ export function LoginModal({ isOpen, onClose, onLogin }) {
             <button
               type="submit"
               disabled={loading || phone.length < 10}
+              data-testid="send-otp-button"
               style={{
                 width: '100%',
                 padding: '12px 24px',
@@ -214,6 +216,7 @@ export function LoginModal({ isOpen, onClose, onLogin }) {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="123456"
+                data-testid="otp-input"
                 style={{
                   width: '100%',
                   padding: '12px 14px',
@@ -247,6 +250,7 @@ export function LoginModal({ isOpen, onClose, onLogin }) {
             <button
               type="submit"
               disabled={loading || otp.length < 6}
+              data-testid="verify-button"
               style={{
                 width: '100%',
                 padding: '12px 24px',
@@ -275,6 +279,7 @@ export function UserMenu({ user, onLogout }) {
     <div style={{ position: 'relative' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        data-testid="user-menu-button"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -329,6 +334,7 @@ export function UserMenu({ user, onLogout }) {
               setIsOpen(false);
               onLogout();
             }}
+            data-testid="logout-button"
             style={{
               width: '100%',
               padding: 12,
