@@ -40,11 +40,20 @@ export function useEvents() {
 
   // Enriched events with party and constituency data
   const enrichedEvents = useMemo(() => {
-    return filteredEvents.map(event => ({
-      ...event,
-      party: parties.find(p => p.id === event.partyId) || null,
-      constituency: constituencies.find(c => c.id === event.constituencyId) || null,
-    }));
+    return filteredEvents.map(event => {
+      // Safely handle venue and coordinates
+      let venue = event.venue;
+      if (venue && !venue.coordinates) {
+        venue = { ...venue, coordinates: null };
+      }
+      
+      return {
+        ...event,
+        venue: venue || { name: 'TBD', address: '', coordinates: null },
+        party: parties.find(p => p.id === event.partyId) || null,
+        constituency: constituencies.find(c => c.id === event.constituencyId) || null,
+      };
+    });
   }, [filteredEvents, parties, constituencies]);
 
   // Events grouped by date
@@ -87,8 +96,14 @@ export function useEvents() {
     const event = events.find(e => e.id === id);
     if (!event) return null;
     
+    let venue = event.venue;
+    if (venue && !venue.coordinates) {
+      venue = { ...venue, coordinates: null };
+    }
+    
     return {
       ...event,
+      venue: venue || { name: 'TBD', address: '', coordinates: null },
       party: parties.find(p => p.id === event.partyId) || null,
       constituency: constituencies.find(c => c.id === event.constituencyId) || null,
     };

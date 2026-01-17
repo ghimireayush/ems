@@ -93,7 +93,16 @@ function getStoredUser() {
 }
 
 async function request(method, path, options = {}) {
-  const url = new URL(`${CONFIG.baseUrl}${path}`);
+  let url;
+  const fullPath = `${CONFIG.baseUrl}${path}`;
+  
+  // Handle both absolute and relative URLs
+  if (fullPath.startsWith('http://') || fullPath.startsWith('https://')) {
+    url = new URL(fullPath);
+  } else {
+    // For relative paths, construct URL from current location
+    url = new URL(fullPath, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+  }
   
   // Add query params
   if (options.params) {
@@ -194,22 +203,23 @@ export const api = {
   events: {
     async list(filters = {}) {
       const response = await request('GET', '/events', { 
-        params: transformParams(filters), 
-        auth: false 
+        params: transformParams(filters)
+        // Remove auth: false to include auth when available
       });
       return toCamelCase(response);
     },
 
     async nearby(params) {
       const response = await request('GET', '/events/nearby', { 
-        params: transformParams(params), 
-        auth: false 
+        params: transformParams(params)
+        // Remove auth: false to include auth when available
       });
       return toCamelCase(response);
     },
 
     async get(id) {
-      const response = await request('GET', `/events/${id}`, { auth: false });
+      const response = await request('GET', `/events/${id}`);
+      // Remove auth: false to include auth when available
       return toCamelCase(response);
     },
 

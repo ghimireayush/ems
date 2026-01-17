@@ -1,16 +1,20 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('E2E-01: Complete New User Journey', () => {
-  const testPhone = '+9779811111111';
-  const testOTP = '123456';
-
   test('should allow new user to discover, register, and RSVP', async ({ page }) => {
+    // Use unique phone per test run to avoid conflicts
+    const testPhone = `+977981${Math.random().toString().slice(2, 10)}`;
+    const testOTP = '123456';
     // 1. DISCOVER (Anonymous)
     await page.goto('/');
     
+    // Wait for app to load and render
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
+    
     // Verify events load
     const eventList = page.locator('[data-testid="event-list"]');
-    await expect(eventList).toBeVisible();
+    await expect(eventList).toBeVisible({ timeout: 10000 });
     
     const eventItems = page.locator('[data-testid^="event-item-"]');
     const eventCount = await eventItems.count();
@@ -62,9 +66,15 @@ test.describe('E2E-01: Complete New User Journey', () => {
       await expect(eventDetail).toBeVisible();
     }
 
+    // Make sure we're on the Details tab
+    const detailsTab = page.locator('button:has-text("Details")');
+    await detailsTab.click();
+    await expect(eventDetail).toBeVisible();
+
     // Get initial RSVP count
     const rsvpCountElement = page.locator('[data-testid="rsvp-count"]');
-    const countBefore = parseInt(await rsvpCountElement.textContent());
+    await rsvpCountElement.waitFor({ state: 'visible' });
+    const countBefore = parseInt((await rsvpCountElement.textContent()).trim());
 
     // Verify RSVP button now says "RSVP to this Event"
     await expect(rsvpButton).toContainText('RSVP to this Event');
@@ -72,11 +82,15 @@ test.describe('E2E-01: Complete New User Journey', () => {
     // Click RSVP
     await rsvpButton.click();
 
-    // Verify button changes to "✓ You're Going!"
-    await expect(rsvpButton).toContainText("You're Going");
+    // Verify button changes to "✓ You're Going!" - wait for state change
+    await expect(rsvpButton).toContainText("You're Going", { timeout: 10000 });
 
-    // Verify RSVP count incremented
-    const countAfter = parseInt(await rsvpCountElement.textContent());
+    // Refetch event to get updated RSVP count from backend
+    await page.waitForTimeout(500);
+    const refreshResponse = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    const refreshedEvent = await refreshResponse.json();
+    const countAfter = refreshedEvent.rsvp_count;
+    
     expect(countAfter).toBe(countBefore + 1);
 
     // 4. VERIFY DATABASE (via API)

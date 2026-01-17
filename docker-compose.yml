@@ -48,29 +48,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # ==========================================================================
-  # FRONTEND - React + Nginx
-  # ==========================================================================
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        VITE_API_URL: /api/v1
-        VITE_DATA_MODE: api
-    container_name: nepal-elections-web
-    restart: unless-stopped
-    ports:
-      - "3000:80"
-    depends_on:
-      backend:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 volumes:
   postgres_data:
 

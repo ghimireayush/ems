@@ -199,7 +199,7 @@ function AppContent() {
           {/* Panel content */}
           <div style={{ flex: 1, overflow: 'hidden' }}>
             {activePanel === 'list' ? (
-              <EventList />
+              <EventList onSelectEvent={handleEventSelect} />
             ) : (
               <EventDetail 
                 user={user} 

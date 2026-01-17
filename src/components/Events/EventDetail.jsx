@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { 
@@ -17,6 +17,15 @@ export function EventDetail({ user, onLoginRequired }) {
   const event = state.selectedEvent;
   const [rsvpLoading, setRsvpLoading] = useState(false);
   const [rsvpError, setRsvpError] = useState(null);
+
+  // Log when event changes
+  useEffect(() => {
+    if (event?.userRsvp) {
+      setRsvpLoading(false);
+    }
+  }, [event?.userRsvp]);
+
+  console.log('[EventDetail] Rendering - event.id:', event?.id, 'event.userRsvp:', event?.userRsvp, 'rsvpLoading:', rsvpLoading);
 
   if (!event) {
     return (
@@ -50,9 +59,9 @@ export function EventDetail({ user, onLoginRequired }) {
 
     try {
       await actions.rsvpEvent(event.id);
+      setRsvpLoading(false);
     } catch (err) {
       setRsvpError(err.message || 'Failed to RSVP');
-    } finally {
       setRsvpLoading(false);
     }
   };

@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('E2E-03: Idempotent RSVP (No Double-Count)', () => {
-  const testPhone = '+9779800000099';
   const testOTP = '123456';
 
   test('should not inflate RSVP count on duplicate attempts', async ({ page }) => {
+    // Use unique phone per test run to avoid conflicts
+    const testPhone = `+977981${Math.random().toString().slice(2, 10)}`;
+    
     // Setup: Login
     await page.goto('/');
     
@@ -37,11 +39,23 @@ test.describe('E2E-03: Idempotent RSVP (No Double-Count)', () => {
     const eventItems2 = page.locator('[data-testid^="event-item-"]');
     await eventItems2.first().click();
 
+    // Wait for event detail to load and make sure we're on Details tab
+    const eventDetail = page.locator('[data-testid="event-detail"]');
+    await expect(eventDetail).toBeVisible();
+    
+    const detailsTab = page.locator('button:has-text("Details")');
+    await detailsTab.click();
+    await expect(eventDetail).toBeVisible();
+
     const rsvpButton = page.locator('[data-testid="rsvp-button"]');
+    await expect(rsvpButton).toBeEnabled();
     await rsvpButton.click();
 
-    // Verify button shows "You're Going"
-    await expect(rsvpButton).toContainText("You're Going");
+    // Verify button shows "You're Going" - wait for state change
+    await expect(rsvpButton).toContainText("You're Going", { timeout: 10000 });
+
+    // Wait for network to settle after RSVP
+    await page.waitForLoadState('networkidle');
 
     // Get count after first RSVP
     const afterFirstResponse = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);

@@ -70,39 +70,44 @@ export function EventMap() {
         />
 
         {/* Constituency boundaries */}
-        {constituencies.map(constituency => (
-          <Rectangle
-            key={constituency.id}
-            bounds={[
-              [constituency.bounds[0][0], constituency.bounds[0][1]],
-              [constituency.bounds[2][0], constituency.bounds[2][1]],
-            ]}
-            pathOptions={{
-              color: state.filters.constituencyId === constituency.id ? '#1976d2' : '#666',
-              weight: state.filters.constituencyId === constituency.id ? 3 : 1,
-              fillOpacity: 0.05,
-              dashArray: state.filters.constituencyId === constituency.id ? null : '5, 5',
-            }}
-            eventHandlers={{
-              click: () => {
-                if (state.filters.constituencyId === constituency.id) {
-                  actions.setFilter('constituencyId', null);
-                } else {
-                  actions.setFilter('constituencyId', constituency.id);
-                  actions.setMapView(constituency.center, 14);
-                }
-              },
-            }}
-          >
-            <Popup>
-              <strong>{constituency.name}</strong>
-              <br />
-              {constituency.nameNepali}
-              <br />
-              <small>{constituency.registeredVoters.toLocaleString()} voters</small>
-            </Popup>
-          </Rectangle>
-        ))}
+        {constituencies.map(constituency => {
+          const bounds = constituency.bounds;
+          if (!bounds || bounds.length < 2) return null;
+          
+          return (
+            <Rectangle
+              key={constituency.id}
+              bounds={[
+                [bounds[0][0], bounds[0][1]],
+                [bounds[1][0], bounds[1][1]],
+              ]}
+              pathOptions={{
+                color: state.filters.constituencyId === constituency.id ? '#1976d2' : '#666',
+                weight: state.filters.constituencyId === constituency.id ? 3 : 1,
+                fillOpacity: 0.05,
+                dashArray: state.filters.constituencyId === constituency.id ? null : '5, 5',
+              }}
+              eventHandlers={{
+                click: () => {
+                  if (state.filters.constituencyId === constituency.id) {
+                    actions.setFilter('constituencyId', null);
+                  } else {
+                    actions.setFilter('constituencyId', constituency.id);
+                    actions.setMapView(constituency.center, 14);
+                  }
+                },
+              }}
+            >
+              <Popup>
+                <strong>{constituency.name}</strong>
+                <br />
+                {constituency.nameNepali}
+                <br />
+                <small>{constituency.registeredVoters?.toLocaleString()} voters</small>
+              </Popup>
+            </Rectangle>
+          );
+        })}
 
         {/* Event markers */}
         {events.map(event => (

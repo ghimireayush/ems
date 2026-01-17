@@ -12,7 +12,7 @@ import {
   searchEvents 
 } from '../../utils/helpers';
 
-export function EventList() {
+export function EventList({ onSelectEvent }) {
   const { state, actions } = useApp();
   const { events, eventsByDate, filteredCount, totalCount } = useEvents();
   const { sortByDistance, location } = useGeolocation();
@@ -31,6 +31,14 @@ export function EventList() {
   const groupedEvents = sortBy === 'date' 
     ? groupEventsByDate(displayEvents)
     : null;
+
+  const handleSelectEvent = (event) => {
+    if (onSelectEvent) {
+      onSelectEvent(event);
+    } else {
+      actions.selectEvent(event);
+    }
+  };
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }} data-testid="event-list">
@@ -105,7 +113,7 @@ export function EventList() {
                   key={event.id} 
                   event={event} 
                   isSelected={state.selectedEvent?.id === event.id}
-                  onSelect={() => actions.selectEvent(event)}
+                  onSelect={() => handleSelectEvent(event)}
                 />
               ))}
             </div>
@@ -118,7 +126,7 @@ export function EventList() {
               event={event}
               showDistance={sortBy === 'distance'}
               isSelected={state.selectedEvent?.id === event.id}
-              onSelect={() => actions.selectEvent(event)}
+              onSelect={() => handleSelectEvent(event)}
             />
           ))
         )}
@@ -190,7 +198,7 @@ function EventCard({ event, isSelected, onSelect, showDistance }) {
           
           {/* Details */}
           <div style={{ fontSize: 12, color: '#666' }}>
-            <div>📍 {event.venue.name}</div>
+            <div>📍 {event.venue?.name || 'TBD'}</div>
             <div>🕐 {formatTime(event.datetime)}</div>
             {showDistance && event.distance !== null && (
               <div>📏 {formatDistance(event.distance)} away</div>
@@ -217,6 +225,7 @@ function EventCard({ event, isSelected, onSelect, showDistance }) {
 function groupEventsByDate(events) {
   const grouped = {};
   events.forEach(event => {
+    if (!event.datetime) return; // Skip events without datetime
     const dateKey = new Date(event.datetime).toISOString().split('T')[0];
     if (!grouped[dateKey]) {
       grouped[dateKey] = [];

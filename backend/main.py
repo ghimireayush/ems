@@ -220,6 +220,7 @@ def row_to_event(row: dict) -> dict:
             "name": row.get("constituency_name"),
             "province": row.get("province"),
             "district": row.get("district"),
+            "registered_voters": row.get("registered_voters", 0),
         } if row.get("constituency_name") else None,
         "tags": row.get("tags") or [],
     }
@@ -241,6 +242,20 @@ def row_to_party(row: dict) -> dict:
 
 def row_to_constituency(row: dict) -> dict:
     """Convert database row to API constituency format."""
+    import json
+    
+    # Parse bounds from GeoJSON if available
+    bounds = None
+    if row.get("bounds_geojson"):
+        try:
+            geojson = json.loads(row["bounds_geojson"])
+            if geojson.get("type") == "Polygon":
+                coords = geojson.get("coordinates", [[]])[0]
+                if coords:
+                    bounds = [[coords[0][1], coords[0][0]], [coords[2][1], coords[2][0]]]
+        except:
+            pass
+    
     return {
         "id": row["id"],
         "name": row["name"],
@@ -253,6 +268,7 @@ def row_to_constituency(row: dict) -> dict:
             float(row["center_lat"]), 
             float(row["center_lng"])
         ] if row.get("center_lat") else None,
+        "bounds": bounds or [[27.0, 85.0], [28.0, 86.0]],
     }
 
 # ============================================================================
@@ -271,8 +287,9 @@ async def list_events(
     sort: Optional[str] = Query("datetime"),
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
+    user: Optional[dict] = Depends(get_current_user),
 ):
-    """List events with filtering."""
+    """List events with filtering and user RSVP status."""
     with get_db() as conn:
         cur = conn.cursor()
         
@@ -331,8 +348,23 @@ async def list_events(
         cur.execute(query, params)
         rows = cur.fetchall()
         
+        events = []
+        for row in rows:
+            event = row_to_event(row)
+            # Always include user_rsvp (null for guests, status for authenticated users)
+            if user:
+                cur.execute(
+                    "SELECT status FROM rsvps WHERE user_id = %s AND event_id = %s",
+                    (user["id"], event["id"])
+                )
+                rsvp = cur.fetchone()
+                event["user_rsvp"] = rsvp["status"] if rsvp else None
+            else:
+                event["user_rsvp"] = None
+            events.append(event)
+        
         return {
-            "data": [row_to_event(row) for row in rows],
+            "data": events,
             "pagination": {
                 "page": page,
                 "per_page": per_page,
@@ -379,7 +411,7 @@ async def list_events_nearby(
 
 @app.get("/v1/events/{event_id}")
 async def get_event(event_id: str, user: Optional[dict] = Depends(get_current_user)):
-    """Get single event details."""
+    """Get single event details with user's RSVP status."""
     with get_db() as conn:
         cur = conn.cursor()
         
@@ -391,7 +423,7 @@ async def get_event(event_id: str, user: Optional[dict] = Depends(get_current_us
         
         event = row_to_event(row)
         
-        # Add user's RSVP status if logged in
+        # Always include user_rsvp status (null for guests, status string for authenticated users)
         if user:
             cur.execute(
                 "SELECT status FROM rsvps WHERE user_id = %s AND event_id = %s",
@@ -399,45 +431,55 @@ async def get_event(event_id: str, user: Optional[dict] = Depends(get_current_us
             )
             rsvp = cur.fetchone()
             event["user_rsvp"] = rsvp["status"] if rsvp else None
+        else:
+            event["user_rsvp"] = None
         
         return event
 
 @app.post("/v1/events/{event_id}/rsvp")
 async def rsvp_event(
     event_id: str, 
-    body: RsvpRequest = None, 
+    body: RsvpRequest,
     user: dict = Depends(require_auth)
 ):
-    """RSVP to an event - persists to database."""
-    status = body.status if body else "going"
+    """RSVP to an event - returns full updated event with user_rsvp status."""
+    status = body.status
     
-    with get_db() as conn:
-        cur = conn.cursor()
-        
-        # Check event exists
-        cur.execute("SELECT id FROM events WHERE id = %s", (event_id,))
-        if not cur.fetchone():
-            raise HTTPException(status_code=404, detail="Event not found")
-        
-        # Upsert RSVP
-        cur.execute("""
-            INSERT INTO rsvps (user_id, event_id, status, created_at)
-            VALUES (%s, %s, %s, NOW())
-            ON CONFLICT (user_id, event_id) 
-            DO UPDATE SET status = EXCLUDED.status
-            RETURNING *
-        """, (user["id"], event_id, status))
-        
-        # Get updated RSVP count (trigger should have updated it)
-        cur.execute("SELECT rsvp_count FROM events WHERE id = %s", (event_id,))
-        count_row = cur.fetchone()
-        
-        return {
-            "event_id": event_id,
-            "status": status,
-            "rsvp_count": count_row["rsvp_count"] if count_row else 0,
-            "user_id": user["id"]
-        }
+    try:
+        with get_db() as conn:
+            cur = conn.cursor()
+            
+            # Check event exists
+            cur.execute("SELECT id FROM events WHERE id = %s", (event_id,))
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="Event not found")
+            
+            # Upsert RSVP (insert or update)
+            cur.execute("""
+                INSERT INTO rsvps (user_id, event_id, status, created_at)
+                VALUES (%s, %s, %s, NOW())
+                ON CONFLICT (user_id, event_id) 
+                DO UPDATE SET status = EXCLUDED.status
+                RETURNING *
+            """, (user["id"], event_id, status))
+            
+            # Get full updated event with user's RSVP status
+            cur.execute("SELECT * FROM events_full WHERE id = %s", (event_id,))
+            event_row = cur.fetchone()
+            
+            if not event_row:
+                raise HTTPException(status_code=404, detail="Event not found after RSVP")
+            
+            event = row_to_event(event_row)
+            # Always set user_rsvp to the status we just set
+            event["user_rsvp"] = status
+            
+            return event
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error in RSVP endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"RSVP failed: {str(e)}")
 
 @app.delete("/v1/events/{event_id}/rsvp")
 async def cancel_rsvp(event_id: str, user: dict = Depends(require_auth)):
@@ -530,7 +572,8 @@ async def list_constituencies(
             SELECT id, name, name_nepali, province, district, 
                    constituency_type, registered_voters,
                    ST_Y(center::geometry) as center_lat,
-                   ST_X(center::geometry) as center_lng
+                   ST_X(center::geometry) as center_lng,
+                   ST_AsGeoJSON(bounds) as bounds_geojson
             FROM constituencies WHERE 1=1
         """
         params = []
@@ -559,7 +602,8 @@ async def detect_constituency(lat: float = Query(...), lng: float = Query(...)):
             SELECT id, name, name_nepali, province, district,
                    constituency_type, registered_voters,
                    ST_Y(center::geometry) as center_lat,
-                   ST_X(center::geometry) as center_lng
+                   ST_X(center::geometry) as center_lng,
+                   ST_AsGeoJSON(bounds) as bounds_geojson
             FROM constituencies
             WHERE ST_Contains(bounds::geometry, ST_SetSRID(ST_MakePoint(%s, %s), 4326))
             LIMIT 1
@@ -582,7 +626,8 @@ async def get_constituency(constituency_id: str):
             SELECT id, name, name_nepali, province, district,
                    constituency_type, registered_voters,
                    ST_Y(center::geometry) as center_lat,
-                   ST_X(center::geometry) as center_lng
+                   ST_X(center::geometry) as center_lng,
+                   ST_AsGeoJSON(bounds) as bounds_geojson
             FROM constituencies WHERE id = %s
         """, (constituency_id,))
         

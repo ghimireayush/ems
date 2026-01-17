@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('E2E-04: Session Persistence and Token Validity', () => {
-  const testPhone = '+9779800000088';
+  const testPhone = `+977981${Math.random().toString().slice(2, 10)}`;
   const testOTP = '123456';
 
   test('should persist session across page refresh', async ({ page }) => {
     // Login
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     
     await page.locator('[data-testid="login-button"]').click();
     const loginModal = page.locator('[data-testid="login-modal"]');
@@ -19,22 +20,28 @@ test.describe('E2E-04: Session Persistence and Token Validity', () => {
     await page.locator('[data-testid="otp-input"]').fill(testOTP);
     await page.locator('[data-testid="verify-button"]').click();
 
-    // Verify logged in
     await expect(loginModal).not.toBeVisible();
     const userMenuButton = page.locator('[data-testid="user-menu-button"]');
     await expect(userMenuButton).toBeVisible();
 
-    // Refresh page
-    await page.reload();
+    // Verify token is in localStorage
+    const token = await page.evaluate(() => localStorage.getItem('nepal_elections_token'));
+    expect(token).toBeTruthy();
 
-    // Verify still logged in (no login prompt)
+    // Hard refresh
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+
+    // Verify still logged in
     await expect(userMenuButton).toBeVisible();
-    await expect(loginModal).not.toBeVisible();
+    const tokenAfterRefresh = await page.evaluate(() => localStorage.getItem('nepal_elections_token'));
+    expect(tokenAfterRefresh).toBe(token);
   });
 
   test('should clear session on logout', async ({ page }) => {
     // Login
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     
     await page.locator('[data-testid="login-button"]').click();
     const loginModal = page.locator('[data-testid="login-modal"]');
@@ -48,20 +55,26 @@ test.describe('E2E-04: Session Persistence and Token Validity', () => {
     await page.locator('[data-testid="verify-button"]').click();
 
     await expect(loginModal).not.toBeVisible();
+    const userMenuButton = page.locator('[data-testid="user-menu-button"]');
+    await expect(userMenuButton).toBeVisible();
 
     // Logout
-    const userMenuButton = page.locator('[data-testid="user-menu-button"]');
     await userMenuButton.click();
-    
-    const logoutButton = page.locator('[data-testid="logout-button"]');
+    const logoutButton = page.locator('button:has-text("Logout")');
+    await expect(logoutButton).toBeVisible();
     await logoutButton.click();
 
     // Verify logged out
-    const loginButton = page.locator('[data-testid="login-button"]');
-    await expect(loginButton).toBeVisible();
+    const loginBtn = page.locator('[data-testid="login-button"]');
+    await expect(loginBtn).toBeVisible();
+
+    // Verify token cleared
+    const token = await page.evaluate(() => localStorage.getItem('nepal_elections_token'));
+    expect(token).toBeNull();
 
     // Refresh and verify still logged out
     await page.reload();
-    await expect(loginButton).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    await expect(loginBtn).toBeVisible();
   });
 });

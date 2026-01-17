@@ -7,6 +7,10 @@
 --   CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ============================================================================
 
+-- Create required extensions
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- Drop existing tables (for regeneration)
 DROP TABLE IF EXISTS rsvps CASCADE;
 DROP TABLE IF EXISTS event_tags CASCADE;
@@ -19,6 +23,10 @@ DROP TABLE IF EXISTS users CASCADE;
 DROP TYPE IF EXISTS event_type CASCADE;
 DROP TYPE IF EXISTS event_status CASCADE;
 DROP TYPE IF EXISTS user_role CASCADE;
+
+-- Drop existing functions and triggers
+DROP TRIGGER IF EXISTS update_rsvp_count ON rsvps;
+DROP FUNCTION IF EXISTS update_event_rsvp_count();
 
 -- ============================================================================
 -- ENUMS
@@ -57,7 +65,7 @@ CREATE TABLE parties (
   name VARCHAR(255) NOT NULL,
   name_nepali VARCHAR(255),
   short_name VARCHAR(20) NOT NULL,
-  color VARCHAR(7), -- Hex color code
+  color VARCHAR(7),
   ideology VARCHAR(255),
   leader VARCHAR(255),
   founded INTEGER,
@@ -80,10 +88,10 @@ CREATE TABLE constituencies (
   name_nepali VARCHAR(255),
   province VARCHAR(100) NOT NULL,
   district VARCHAR(100) NOT NULL,
-  constituency_type VARCHAR(20) DEFAULT 'FPTP', -- FPTP or PR
+  constituency_type VARCHAR(20) DEFAULT 'FPTP',
   registered_voters INTEGER DEFAULT 0,
-  center GEOGRAPHY(POINT, 4326), -- PostGIS point (lat/lng)
-  bounds GEOGRAPHY(POLYGON, 4326), -- PostGIS polygon
+  center GEOGRAPHY(POINT, 4326),
+  bounds GEOGRAPHY(POLYGON, 4326),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -128,7 +136,7 @@ CREATE TABLE events (
   description TEXT,
   datetime TIMESTAMPTZ NOT NULL,
   end_time TIMESTAMPTZ,
-  speakers TEXT[], -- PostgreSQL array
+  speakers TEXT[],
   expected_attendance INTEGER DEFAULT 0,
   rsvp_count INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -142,7 +150,7 @@ CREATE INDEX idx_events_type ON events(event_type);
 CREATE INDEX idx_events_status ON events(status);
 
 -- ============================================================================
--- EVENT TAGS (Many-to-Many)
+-- EVENT TAGS
 -- ============================================================================
 
 CREATE TABLE event_tags (
@@ -158,14 +166,14 @@ CREATE INDEX idx_event_tags_tag ON event_tags(tag);
 -- ============================================================================
 
 CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  phone VARCHAR(20) UNIQUE, -- Primary identifier in Nepal
+  id VARCHAR(50) PRIMARY KEY,
+  phone VARCHAR(20) UNIQUE,
   email VARCHAR(255) UNIQUE,
   name VARCHAR(255),
   role user_role DEFAULT 'citizen',
   constituency_id VARCHAR(50) REFERENCES constituencies(id),
   location GEOGRAPHY(POINT, 4326),
-  party_id VARCHAR(50) REFERENCES parties(id), -- For party admins
+  party_id VARCHAR(50) REFERENCES parties(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -180,9 +188,9 @@ CREATE INDEX idx_users_role ON users(role);
 
 CREATE TABLE rsvps (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  user_id VARCHAR(50) REFERENCES users(id) ON DELETE CASCADE,
   event_id VARCHAR(50) REFERENCES events(id) ON DELETE CASCADE,
-  status VARCHAR(20) DEFAULT 'going', -- going, interested, not_going
+  status VARCHAR(20) DEFAULT 'going',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, event_id)
 );
@@ -194,7 +202,6 @@ CREATE INDEX idx_rsvps_user ON rsvps(user_id);
 -- FUNCTIONS & TRIGGERS
 -- ============================================================================
 
--- Auto-update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -218,7 +225,6 @@ CREATE TRIGGER update_events_updated_at BEFORE UPDATE ON events
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Auto-update RSVP count on events
 CREATE OR REPLACE FUNCTION update_event_rsvp_count()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -226,19 +232,21 @@ BEGIN
     UPDATE events SET rsvp_count = rsvp_count + 1 WHERE id = NEW.event_id;
   ELSIF TG_OP = 'DELETE' THEN
     UPDATE events SET rsvp_count = rsvp_count - 1 WHERE id = OLD.event_id;
+  ELSIF TG_OP = 'UPDATE' THEN
+    -- No change needed for updates (same user, same event)
+    NULL;
   END IF;
   RETURN NULL;
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_rsvp_count AFTER INSERT OR DELETE ON rsvps
+CREATE TRIGGER update_rsvp_count AFTER INSERT OR DELETE OR UPDATE ON rsvps
   FOR EACH ROW EXECUTE FUNCTION update_event_rsvp_count();
 
 -- ============================================================================
--- VIEWS (Convenience)
+-- VIEWS
 -- ============================================================================
 
--- Events with full details
 CREATE OR REPLACE VIEW events_full AS
 SELECT 
   e.*,
@@ -258,7 +266,6 @@ LEFT JOIN parties p ON e.party_id = p.id
 LEFT JOIN constituencies c ON e.constituency_id = c.id
 LEFT JOIN venues v ON e.venue_id = v.id;
 
--- Events near a point (usage: SELECT * FROM events_near(27.7172, 85.3240, 5000))
 CREATE OR REPLACE FUNCTION events_near(lat FLOAT, lng FLOAT, radius_meters INT DEFAULT 5000)
 RETURNS TABLE (
   id VARCHAR(50),
@@ -283,7 +290,3 @@ BEGIN
   ORDER BY distance_meters;
 END;
 $$ LANGUAGE plpgsql;
-
--- ============================================================================
--- SCHEMA COMPLETE
--- ============================================================================

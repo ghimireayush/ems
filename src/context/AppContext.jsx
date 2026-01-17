@@ -110,6 +110,9 @@ function appReducer(state, action) {
         events: state.events.map(evt =>
           evt.id === action.payload.id ? { ...evt, ...action.payload } : evt
         ),
+        selectedEvent: state.selectedEvent?.id === action.payload.id
+          ? { ...state.selectedEvent, ...action.payload }
+          : state.selectedEvent,
       };
     
     default:
@@ -138,12 +141,15 @@ export function AppProvider({ children }) {
           dataProvider.meta.eventTypes(),
         ]);
 
+        // Handle both direct array and paginated response
+        const eventsData = Array.isArray(eventsResult) ? eventsResult : (eventsResult?.data || []);
+        
         dispatch({
           type: ACTIONS.SET_DATA,
           payload: {
             parties: partiesResult,
             constituencies: constituenciesResult,
-            events: eventsResult.data,
+            events: eventsData,
             eventTypes: eventTypes,
           },
         });
@@ -180,8 +186,8 @@ export function AppProvider({ children }) {
       dispatch({ type: ACTIONS.CLEAR_FILTERS });
     },
     
-    selectEvent: async (event) => {
-      if (event && !event.party) {
+    selectEvent: async (event, skipRefetch = false) => {
+      if (event && !event.party && !skipRefetch) {
         // Fetch full event details if not enriched
         try {
           const fullEvent = await dataProvider.events.get(event.id);
@@ -207,19 +213,23 @@ export function AppProvider({ children }) {
     
     rsvpEvent: async (eventId) => {
       try {
-        const result = await dataProvider.events.rsvp(eventId, 'going');
+        // Call RSVP endpoint - returns full event with user_rsvp already set
+        const updatedEvent = await dataProvider.events.rsvp(eventId, 'going');
+        
+        // Update the events list
         dispatch({ 
-          type: ACTIONS.RSVP_EVENT, 
-          payload: { eventId, rsvpCount: result.rsvpCount } 
+          type: ACTIONS.UPDATE_EVENT, 
+          payload: updatedEvent
+        });
+        
+        // Update selected event directly
+        dispatch({
+          type: ACTIONS.SELECT_EVENT,
+          payload: updatedEvent
         });
       } catch (error) {
         console.error('RSVP failed:', error);
-        // Optimistic update even on failure for demo
-        const event = state.events.find(e => e.id === eventId);
-        dispatch({ 
-          type: ACTIONS.RSVP_EVENT, 
-          payload: { eventId, rsvpCount: (event?.rsvpCount || 0) + 1 } 
-        });
+        throw error;
       }
     },
 
