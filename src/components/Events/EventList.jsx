@@ -12,22 +12,19 @@ import {
   searchEvents 
 } from '../../utils/helpers';
 
-export function EventList({ onSelectEvent }) {
+export function EventList({ onSelectEvent, isMobile }) {
   const { state, actions } = useApp();
   const { events, eventsByDate, filteredCount, totalCount } = useEvents();
   const { sortByDistance, location } = useGeolocation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('date'); // 'date' | 'distance'
+  const [sortBy, setSortBy] = useState('date');
 
-  // Apply search
   let displayEvents = searchQuery ? searchEvents(events, searchQuery) : events;
   
-  // Apply sort
   if (sortBy === 'distance' && location) {
     displayEvents = sortByDistance(displayEvents);
   }
 
-  // Group by date if sorting by date
   const groupedEvents = sortBy === 'date' 
     ? groupEventsByDate(displayEvents)
     : null;
@@ -43,49 +40,94 @@ export function EventList({ onSelectEvent }) {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }} data-testid="event-list">
       {/* Search and filters */}
-      <div style={{ padding: 12, borderBottom: '1px solid #e0e0e0' }}>
+      <div style={{ 
+        padding: isMobile ? '12px 12px' : '14px 16px', 
+        borderBottom: '1px solid #e8e8e8',
+        background: '#fafafa',
+      }}>
         <input
           type="text"
-          placeholder="Search events..."
+          placeholder="🔍 Search events..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
             width: '100%',
-            padding: '8px 12px',
-            border: '1px solid #ddd',
-            borderRadius: 4,
-            fontSize: 14,
-            marginBottom: 8,
+            padding: isMobile ? '12px 16px' : '10px 14px',
+            border: '1px solid #e0e0e0',
+            borderRadius: 8,
+            fontSize: isMobile ? 16 : 14,
+            marginBottom: isMobile ? 12 : 10,
+            background: 'white',
+            transition: 'all 0.2s ease',
+            minHeight: isMobile ? 48 : 'auto',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = '#667eea';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = '#e0e0e0';
+            e.currentTarget.style.boxShadow = 'none';
           }}
         />
         
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: isMobile ? 6 : 8, alignItems: 'center', flexWrap: isMobile ? 'nowrap' : 'wrap' }}>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            style={{ padding: '4px 8px', borderRadius: 4, border: '1px solid #ddd' }}
+            style={{ 
+              padding: isMobile ? '10px 12px' : '8px 10px', 
+              borderRadius: 6, 
+              border: '1px solid #e0e0e0',
+              fontSize: isMobile ? 14 : 13,
+              fontWeight: 500,
+              background: 'white',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              minHeight: isMobile ? 40 : 'auto',
+              flexShrink: 0,
+            }}
           >
-            <option value="date">Sort by Date</option>
-            <option value="distance" disabled={!location}>Sort by Distance</option>
+            <option value="date">📅 Sort by Date</option>
+            <option value="distance" disabled={!location}>📍 Sort by Distance</option>
           </select>
           
-          <span style={{ fontSize: 12, color: '#666' }}>
-            {displayEvents.length} of {totalCount} events
+          <span style={{ 
+            fontSize: isMobile ? 13 : 12, 
+            color: '#999',
+            fontWeight: 500,
+            marginLeft: 'auto',
+            whiteSpace: 'nowrap',
+          }}>
+            {displayEvents.length} of {totalCount}
           </span>
           
           {Object.values(state.filters).some(v => v !== null) && (
             <button
               onClick={() => actions.clearFilters()}
               style={{
-                padding: '4px 8px',
-                background: '#f5f5f5',
-                border: '1px solid #ddd',
-                borderRadius: 4,
-                fontSize: 12,
+                padding: isMobile ? '8px 12px' : '6px 12px',
+                background: 'white',
+                border: '1px solid #e0e0e0',
+                borderRadius: 6,
+                fontSize: isMobile ? 14 : 12,
                 cursor: 'pointer',
+                fontWeight: 500,
+                color: '#666',
+                transition: 'all 0.2s ease',
+                minHeight: isMobile ? 36 : 'auto',
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#f5f5f5';
+                e.currentTarget.style.borderColor = '#d0d0d0';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'white';
+                e.currentTarget.style.borderColor = '#e0e0e0';
               }}
             >
-              Clear filters
+              ✕ Clear
             </button>
           )}
         </div>
@@ -94,19 +136,22 @@ export function EventList({ onSelectEvent }) {
       {/* Event list */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {sortBy === 'date' && groupedEvents ? (
-          // Grouped by date view
           groupedEvents.map(group => (
             <div key={group.date}>
               <div style={{
-                padding: '8px 12px',
-                background: '#f5f5f5',
+                padding: '10px 16px',
+                background: '#f8f9fa',
                 fontWeight: 600,
-                fontSize: 13,
+                fontSize: 12,
                 position: 'sticky',
                 top: 0,
-                borderBottom: '1px solid #e0e0e0',
+                borderBottom: '1px solid #e8e8e8',
+                color: '#667eea',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                zIndex: 5,
               }}>
-                {getRelativeDate(group.date)} — {formatDate(group.date, { weekday: 'long', month: 'long', day: 'numeric' })}
+                {getRelativeDate(group.date)} — {formatDate(group.date, { weekday: 'long', month: 'short', day: 'numeric' })}
               </div>
               {group.events.map(event => (
                 <EventCard 
@@ -114,12 +159,12 @@ export function EventList({ onSelectEvent }) {
                   event={event} 
                   isSelected={state.selectedEvent?.id === event.id}
                   onSelect={() => handleSelectEvent(event)}
+                  isMobile={isMobile}
                 />
               ))}
             </div>
           ))
         ) : (
-          // Flat list (for distance sort)
           displayEvents.map(event => (
             <EventCard 
               key={event.id} 
@@ -127,13 +172,25 @@ export function EventList({ onSelectEvent }) {
               showDistance={sortBy === 'distance'}
               isSelected={state.selectedEvent?.id === event.id}
               onSelect={() => handleSelectEvent(event)}
+              isMobile={isMobile}
             />
           ))
         )}
 
         {displayEvents.length === 0 && (
-          <div style={{ padding: 24, textAlign: 'center', color: '#666' }}>
-            No events found
+          <div style={{ 
+            padding: 32, 
+            textAlign: 'center', 
+            color: '#999',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+          }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+            <div style={{ fontWeight: 500 }}>No events found</div>
+            <div style={{ fontSize: 12, marginTop: 4 }}>Try adjusting your filters</div>
           </div>
         )}
       </div>
@@ -141,28 +198,38 @@ export function EventList({ onSelectEvent }) {
   );
 }
 
-function EventCard({ event, isSelected, onSelect, showDistance }) {
+function EventCard({ event, isSelected, onSelect, showDistance, isMobile }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div
       data-testid={`event-item-${event.id}`}
       onClick={onSelect}
       style={{
-        padding: 12,
-        borderBottom: '1px solid #eee',
+        padding: isMobile ? '16px 12px' : '14px 16px',
+        borderBottom: '1px solid #f0f0f0',
         cursor: 'pointer',
-        background: isSelected ? '#e3f2fd' : 'white',
-        transition: 'background 0.15s',
+        background: isSelected 
+          ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.04) 100%)'
+          : isHovered 
+            ? '#f8f9fa'
+            : 'white',
+        transition: 'all 0.2s ease',
+        borderLeft: isSelected ? '3px solid #667eea' : '3px solid transparent',
+        paddingLeft: isSelected ? (isMobile ? 9 : 13) : (isMobile ? 12 : 16),
+        minHeight: isMobile ? 80 : 'auto',
       }}
-      onMouseEnter={(e) => !isSelected && (e.currentTarget.style.background = '#f5f5f5')}
-      onMouseLeave={(e) => !isSelected && (e.currentTarget.style.background = 'white')}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <div style={{ display: 'flex', gap: 12 }}>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
         {/* Type icon */}
         <div style={{ 
-          fontSize: 24, 
-          width: 40, 
+          fontSize: isMobile ? 32 : 28, 
+          width: isMobile ? 44 : 40, 
           textAlign: 'center',
           flexShrink: 0,
+          marginTop: 2,
         }}>
           {eventTypeIcons[event.type]}
         </div>
@@ -172,10 +239,13 @@ function EventCard({ event, isSelected, onSelect, showDistance }) {
           {/* Title row */}
           <div style={{ 
             fontWeight: 600, 
-            marginBottom: 4,
+            marginBottom: 6,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            fontSize: isMobile ? 15 : 14,
+            color: '#1a1a1a',
+            lineHeight: isMobile ? 1.3 : 1.4,
           }}>
             {event.title}
           </div>
@@ -185,22 +255,23 @@ function EventCard({ event, isSelected, onSelect, showDistance }) {
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 4,
-              padding: '2px 6px',
-              background: getPartyColor(event.party, 0.1),
+              gap: 5,
+              padding: isMobile ? '5px 10px' : '4px 8px',
+              background: getPartyColor(event.party, 0.12),
               color: event.party.color,
-              borderRadius: 3,
-              fontSize: 11,
-              fontWeight: 500,
-              marginBottom: 4,
+              borderRadius: 5,
+              fontSize: isMobile ? 12 : 11,
+              fontWeight: 600,
+              marginBottom: 6,
+              border: `1px solid ${getPartyColor(event.party, 0.3)}`,
             }}>
               {event.party.logoUrl && (
                 <img 
                   src={`/${event.party.logoUrl}`}
                   alt={event.party.shortName}
                   style={{
-                    width: 14,
-                    height: 14,
+                    width: isMobile ? 16 : 14,
+                    height: isMobile ? 16 : 14,
                     objectFit: 'contain',
                   }}
                 />
@@ -210,7 +281,7 @@ function EventCard({ event, isSelected, onSelect, showDistance }) {
           )}
           
           {/* Details */}
-          <div style={{ fontSize: 12, color: '#666' }}>
+          <div style={{ fontSize: isMobile ? 13 : 12, color: '#666', lineHeight: 1.6 }}>
             <div>📍 {event.venue?.name || 'TBD'}</div>
             <div>🕐 {formatTime(event.datetime)}</div>
             {showDistance && event.distance !== null && (
@@ -223,22 +294,29 @@ function EventCard({ event, isSelected, onSelect, showDistance }) {
         <div style={{ 
           textAlign: 'right',
           flexShrink: 0,
-          fontSize: 12,
+          fontSize: isMobile ? 13 : 12,
           color: '#666',
+          background: isSelected ? 'rgba(102, 126, 234, 0.1)' : '#f8f9fa',
+          padding: isMobile ? '10px 12px' : '8px 10px',
+          borderRadius: 6,
+          minWidth: isMobile ? 60 : 50,
+          minHeight: isMobile ? 48 : 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
         }}>
-          <div style={{ fontWeight: 600, color: '#333' }}>{event.rsvpCount}</div>
-          <div>RSVPs</div>
+          <div style={{ fontWeight: 700, color: '#667eea', fontSize: isMobile ? 18 : 16 }}>{event.rsvpCount}</div>
+          <div style={{ fontSize: isMobile ? 11 : 10, color: '#999', marginTop: 2 }}>RSVPs</div>
         </div>
       </div>
     </div>
   );
 }
 
-// Helper to group events by date
 function groupEventsByDate(events) {
   const grouped = {};
   events.forEach(event => {
-    if (!event.datetime) return; // Skip events without datetime
+    if (!event.datetime) return;
     const dateKey = new Date(event.datetime).toISOString().split('T')[0];
     if (!grouped[dateKey]) {
       grouped[dateKey] = [];
