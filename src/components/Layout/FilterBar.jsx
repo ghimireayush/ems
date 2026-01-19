@@ -120,15 +120,35 @@ export function FilterBar() {
             )}
             title={party.name}
             style={{
-              width: 20,
-              height: 20,
-              borderRadius: '50%',
-              background: party.color,
-              border: filters.partyId === party.id ? '2px solid #333' : '2px solid transparent',
+              width: 24,
+              height: 24,
+              borderRadius: 4,
+              background: party.logoUrl ? 'white' : party.color,
+              border: filters.partyId === party.id ? '2px solid #333' : '1px solid #ddd',
               cursor: 'pointer',
               opacity: filters.partyId && filters.partyId !== party.id ? 0.3 : 1,
+              padding: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
-          />
+          >
+            {party.logoUrl ? (
+              <img 
+                src={`/${party.logoUrl}`}
+                alt={party.shortName}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                }}
+              />
+            ) : (
+              <span style={{ fontSize: 10, fontWeight: 600, color: 'white' }}>
+                {party.shortName.substring(0, 2)}
+              </span>
+            )}
+          </button>
         ))}
       </div>
     </div>

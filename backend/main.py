@@ -238,6 +238,7 @@ def row_to_party(row: dict) -> dict:
         "founded": row.get("founded"),
         "symbol": row.get("symbol"),
         "website": row.get("website"),
+        "logo_url": row.get("logo_url"),
     }
 
 def row_to_constituency(row: dict) -> dict:

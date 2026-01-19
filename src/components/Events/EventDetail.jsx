@@ -104,15 +104,31 @@ export function EventDetail({ user, onLoginRequired }) {
             alignItems: 'center',
             gap: 8,
           }}>
-            <span style={{
-              display: 'inline-block',
-              width: 12,
-              height: 12,
-              background: event.party.color,
-              borderRadius: '50%',
-            }}></span>
-            <span style={{ fontWeight: 500 }}>{event.party.name}</span>
-            <span style={{ color: '#666', fontSize: 13 }}>({event.party.nameNepali})</span>
+            {event.party.logoUrl && (
+              <img 
+                src={`/public/${event.party.logoUrl}`}
+                alt={event.party.name}
+                style={{
+                  width: 32,
+                  height: 32,
+                  objectFit: 'contain',
+                  borderRadius: 4,
+                }}
+              />
+            )}
+            {!event.party.logoUrl && (
+              <span style={{
+                display: 'inline-block',
+                width: 32,
+                height: 32,
+                background: event.party.color,
+                borderRadius: '50%',
+              }}></span>
+            )}
+            <div>
+              <span style={{ fontWeight: 500 }}>{event.party.name}</span>
+              <span style={{ color: '#666', fontSize: 13, marginLeft: 8 }}>({event.party.nameNepali})</span>
+            </div>
           </div>
         )}
       </div>

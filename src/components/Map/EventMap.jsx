@@ -133,15 +133,28 @@ export function EventMap() {
                 
                 {event.party && (
                   <div style={{
-                    display: 'inline-block',
-                    padding: '2px 8px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '4px 8px',
                     background: getPartyColor(event.party, 0.1),
                     color: event.party.color,
                     borderRadius: 4,
                     fontSize: 12,
                     marginBottom: 8,
                   }}>
-                    {event.party.shortName}
+                    {event.party.logoUrl && (
+                      <img 
+                        src={`/${event.party.logoUrl}`}
+                        alt={event.party.shortName}
+                        style={{
+                          width: 16,
+                          height: 16,
+                          objectFit: 'contain',
+                        }}
+                      />
+                    )}
+                    <span>{event.party.shortName}</span>
                   </div>
                 )}
                 

@@ -6,7 +6,7 @@
 BEGIN;
 
 -- Parties
-INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website)
+INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
 VALUES (
   'nc',
   'Nepali Congress',
@@ -17,10 +17,11 @@ VALUES (
   'Sher Bahadur Deuba',
   1947,
   'tree',
-  'https://nepalicongress.org'
+  'https://nepalicongress.org',
+  'Nepali_Congress.png'
 );
 
-INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website)
+INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
 VALUES (
   'uml',
   'CPN (UML)',
@@ -31,10 +32,11 @@ VALUES (
   'K.P. Sharma Oli',
   1991,
   'sun',
-  'https://cpnuml.org'
+  'https://cpnuml.org',
+  'cpnuml.png.png'
 );
 
-INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website)
+INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
 VALUES (
   'maoist',
   'CPN (Maoist Centre)',
@@ -45,10 +47,11 @@ VALUES (
   'Pushpa Kamal Dahal',
   1994,
   'hammer-sickle',
-  NULL
+  NULL,
+  'mao.png'
 );
 
-INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website)
+INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
 VALUES (
   'rsp',
   'Rastriya Swatantra Party',
@@ -59,10 +62,11 @@ VALUES (
   'Rabi Lamichhane',
   2022,
   'key',
-  NULL
+  NULL,
+  'rsp.png'
 );
 
-INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website)
+INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
 VALUES (
   'jsp',
   'Janata Samajwadi Party',
@@ -73,10 +77,11 @@ VALUES (
   'Upendra Yadav',
   2020,
   'chair',
-  NULL
+  NULL,
+  'janata_Samajparty_Party_Nepal.png'
 );
 
-INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website)
+INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
 VALUES (
   'genz',
   'Nawa Nirman Party',
@@ -87,6 +92,7 @@ VALUES (
   'Kishori Karki',
   2025,
   'sunrise',
+  NULL,
   NULL
 );
 

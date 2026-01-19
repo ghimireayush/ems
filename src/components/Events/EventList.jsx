@@ -182,9 +182,11 @@ function EventCard({ event, isSelected, onSelect, showDistance }) {
           
           {/* Party badge */}
           {event.party && (
-            <span style={{
-              display: 'inline-block',
-              padding: '1px 6px',
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '2px 6px',
               background: getPartyColor(event.party, 0.1),
               color: event.party.color,
               borderRadius: 3,
@@ -192,8 +194,19 @@ function EventCard({ event, isSelected, onSelect, showDistance }) {
               fontWeight: 500,
               marginBottom: 4,
             }}>
-              {event.party.shortName}
-            </span>
+              {event.party.logoUrl && (
+                <img 
+                  src={`/${event.party.logoUrl}`}
+                  alt={event.party.shortName}
+                  style={{
+                    width: 14,
+                    height: 14,
+                    objectFit: 'contain',
+                  }}
+                />
+              )}
+              <span>{event.party.shortName}</span>
+            </div>
           )}
           
           {/* Details */}
