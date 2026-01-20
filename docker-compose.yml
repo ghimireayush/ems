@@ -36,7 +36,6 @@ services:
     restart: unless-stopped
     environment:
       DOCKER_ENV: "true"
-      DATABASE_URL: postgresql://nepal:nepal2026@db:5432/nepal_elections
     ports:
       - "5012:5012"
     depends_on:
