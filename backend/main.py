@@ -23,12 +23,12 @@ from psycopg2.extras import RealDictCursor
 
 DATABASE_URL = os.environ.get(
     "DATABASE_URL", 
-    "postgresql://nepal:nepal2026@localhost:5432/nepal_elections"
+    "postgresql://nepal:nepal2026@localhost:5436/nepal_elections"
 )
 
 # For Docker: use service name
 if os.environ.get("DOCKER_ENV"):
-    DATABASE_URL = "postgresql://nepal:nepal2026@db:5432/nepal_elections"
+    DATABASE_URL = "postgresql://nepal:nepal2026@db:5436/nepal_elections"
 
 # ============================================================================
 # DATABASE CONNECTION
@@ -916,4 +916,4 @@ async def startup():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=5012)

@@ -323,7 +323,7 @@ HAVING e.rsvp_count != COUNT(r.id);
 ```yaml
 Prerequisites:
   - Docker and Docker Compose installed
-  - Ports 3000, 8000, 5432 available
+  - Ports 3000, 5012, 5436 available
   - No pre-existing nepal-elections containers
 
 Setup:
@@ -471,7 +471,7 @@ PASS CRITERIA:
 │     └── Verify: rsvp_count = 1                                              │
 │                                                                              │
 │  ATTEMPT DUPLICATE (via API)                                                 │
-│     ├── curl -X POST http://localhost:8000/v1/events/evt-002/rsvp \         │
+│     ├── curl -X POST http://localhost:5012/v1/events/evt-002/rsvp \         │
 │     │        -H "Authorization: Bearer <token>"                             │
 │     ├── Response should succeed (UPSERT)                                    │
 │     └── Verify: rsvp_count still = 1 (not 2)                                │
@@ -566,14 +566,14 @@ PASS CRITERIA:
 │     └── Know constituency bounds (from constituencies.json)                 │
 │                                                                              │
 │  TEST NEARBY EVENTS (API)                                                    │
-│     ├── curl "http://localhost:8000/v1/events/nearby?lat=27.7041&lng=85.3143&radius=1000"
+│     ├── curl "http://localhost:5012/v1/events/nearby?lat=27.7041&lng=85.3143&radius=1000"
 │     ├── Verify: evt-001 is in results (it's at this exact location)         │
 │     ├── Verify: distance_meters ≈ 0 for evt-001                             │
 │     ├── Verify: Events beyond 1km are NOT in results                        │
 │     └── Verify: Results sorted by distance ascending                        │
 │                                                                              │
 │  TEST CONSTITUENCY DETECTION (API)                                           │
-│     ├── curl "http://localhost:8000/v1/constituencies/detect?lat=27.7172&lng=85.3240"
+│     ├── curl "http://localhost:5012/v1/constituencies/detect?lat=27.7172&lng=85.3240"
 │     ├── Verify: Returns a constituency (likely ktm-1 or ktm-2)              │
 │     ├── Test with point outside all boundaries:                             │
 │     │   curl "...?lat=26.0&lng=84.0"                                        │

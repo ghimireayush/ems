@@ -78,5 +78,5 @@ rebuild:
 # Health check
 health:
 	@echo "=== Database ===" && docker compose exec db pg_isready -U nepal -d nepal_elections
-	@echo "=== Backend ===" && curl -s http://localhost:8000/health | head -1
+	@echo "=== Backend ===" && curl -s http://localhost:5012/health | head -1
 	@echo "=== Frontend ===" && curl -s http://localhost:3000/health | head -1

@@ -31,7 +31,7 @@ test.describe('E2E-03: Idempotent RSVP (No Double-Count)', () => {
     await expect(loginModal).not.toBeVisible();
 
     // Get initial count
-    const initialResponse = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    const initialResponse = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     const initialEvent = await initialResponse.json();
     const initialCount = initialEvent.rsvp_count;
 
@@ -58,7 +58,7 @@ test.describe('E2E-03: Idempotent RSVP (No Double-Count)', () => {
     await page.waitForLoadState('networkidle');
 
     // Get count after first RSVP
-    const afterFirstResponse = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    const afterFirstResponse = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     const afterFirstEvent = await afterFirstResponse.json();
     const countAfterFirst = afterFirstEvent.rsvp_count;
 
@@ -67,7 +67,7 @@ test.describe('E2E-03: Idempotent RSVP (No Double-Count)', () => {
     // ATTEMPT DUPLICATE (via API)
     const token = await page.evaluate(() => localStorage.getItem('nepal_elections_token'));
     const duplicateResponse = await page.request.post(
-      `http://localhost:8000/v1/events/${eventId}/rsvp`,
+      `http://localhost:5012/v1/events/${eventId}/rsvp`,
       {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -80,7 +80,7 @@ test.describe('E2E-03: Idempotent RSVP (No Double-Count)', () => {
     expect(duplicateResponse.ok()).toBeTruthy();
 
     // Verify count didn't increase
-    const afterDuplicateResponse = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    const afterDuplicateResponse = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     const afterDuplicateEvent = await afterDuplicateResponse.json();
     
     expect(afterDuplicateEvent.rsvp_count).toBe(countAfterFirst);

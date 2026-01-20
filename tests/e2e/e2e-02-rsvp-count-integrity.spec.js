@@ -15,7 +15,7 @@ test.describe('E2E-02: RSVP Count Integrity Under Multiple Users', () => {
     const eventId = firstEventId.replace('event-item-', '');
 
     // Get initial RSVP count
-    const initialResponse = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    const initialResponse = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     const initialEvent = await initialResponse.json();
     const initialCount = initialEvent.rsvp_count;
 
@@ -52,17 +52,17 @@ test.describe('E2E-02: RSVP Count Integrity Under Multiple Users', () => {
     await expect(rsvpButton).toContainText("You're Going", { timeout: 10000 });
 
     // Verify count incremented
-    let response = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    let response = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     let event = await response.json();
     expect(event.rsvp_count).toBe(initialCount + 1);
 
     // User 2: RSVP via API (simulates different user)
     const phone2 = `+977981${Math.random().toString().slice(2, 10)}`;
-    await page.request.post(`http://localhost:8000/v1/auth/request-otp`, {
+    await page.request.post(`http://localhost:5012/v1/auth/request-otp`, {
       data: { phone: phone2 }
     });
     
-    const verifyResponse2 = await page.request.post(`http://localhost:8000/v1/auth/verify-otp`, {
+    const verifyResponse2 = await page.request.post(`http://localhost:5012/v1/auth/verify-otp`, {
       data: { phone: phone2, otp: '123456' }
     });
     expect(verifyResponse2.ok()).toBeTruthy();
@@ -70,7 +70,7 @@ test.describe('E2E-02: RSVP Count Integrity Under Multiple Users', () => {
     const token2 = verifyData2.access_token;
 
     // User 2 RSVPs via API
-    const rsvpResponse2 = await page.request.post(`http://localhost:8000/v1/events/${eventId}/rsvp`, {
+    const rsvpResponse2 = await page.request.post(`http://localhost:5012/v1/events/${eventId}/rsvp`, {
       headers: { Authorization: `Bearer ${token2}` },
       data: { status: 'going' }
     });
@@ -80,17 +80,17 @@ test.describe('E2E-02: RSVP Count Integrity Under Multiple Users', () => {
     await page.waitForTimeout(500);
 
     // Verify count incremented
-    response = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    response = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     event = await response.json();
     expect(event.rsvp_count).toBe(initialCount + 2);
 
     // User 3: RSVP via API
     const phone3 = `+977981${Math.random().toString().slice(2, 10)}`;
-    await page.request.post(`http://localhost:8000/v1/auth/request-otp`, {
+    await page.request.post(`http://localhost:5012/v1/auth/request-otp`, {
       data: { phone: phone3 }
     });
     
-    const verify3Response = await page.request.post(`http://localhost:8000/v1/auth/verify-otp`, {
+    const verify3Response = await page.request.post(`http://localhost:5012/v1/auth/verify-otp`, {
       data: { phone: phone3, otp: '123456' }
     });
     expect(verify3Response.ok()).toBeTruthy();
@@ -98,7 +98,7 @@ test.describe('E2E-02: RSVP Count Integrity Under Multiple Users', () => {
     const token3 = verify3Data.access_token;
 
     // User 3 RSVPs via API
-    const rsvpResponse3 = await page.request.post(`http://localhost:8000/v1/events/${eventId}/rsvp`, {
+    const rsvpResponse3 = await page.request.post(`http://localhost:5012/v1/events/${eventId}/rsvp`, {
       headers: { Authorization: `Bearer ${token3}` },
       data: { status: 'going' }
     });
@@ -108,7 +108,7 @@ test.describe('E2E-02: RSVP Count Integrity Under Multiple Users', () => {
     await page.waitForTimeout(500);
 
     // Final verification
-    response = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    response = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     event = await response.json();
     expect(event.rsvp_count).toBe(initialCount + 3);
   });

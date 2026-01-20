@@ -18,7 +18,7 @@ services:
       - ./sql/002_seed.sql:/docker-entrypoint-initdb.d/002_seed.sql:ro
       - ./sql/003_reset_rsvp.sql:/docker-entrypoint-initdb.d/003_reset_rsvp.sql:ro
     ports:
-      - "5432:5432"
+      - "5436:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U nepal -d nepal_elections"]
       interval: 10s
@@ -38,12 +38,12 @@ services:
       DOCKER_ENV: "true"
       DATABASE_URL: postgresql://nepal:nepal2026@db:5432/nepal_elections
     ports:
-      - "8000:8000"
+      - "5012:5012"
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5012/health')"]
       interval: 10s
       timeout: 5s
       retries: 5

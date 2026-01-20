@@ -28,8 +28,8 @@ export default defineConfig({
       timeout: 120 * 1000,
     },
     {
-      command: 'echo "Backend should be running on port 8000"',
-      url: 'http://localhost:8000/health',
+      command: 'echo "Backend should be running on port 5012"',
+      url: 'http://localhost:5012/health',
       reuseExistingServer: true,
       timeout: 30 * 1000,
     },

@@ -5,7 +5,7 @@ test.describe('E2E-05: Geo-Based Event Discovery', () => {
     // Test the nearby endpoint with known coordinates
     // Basantapur (evt-001 location): [27.7041, 85.3143]
     const response = await page.request.get(
-      'http://localhost:8000/v1/events/nearby?lat=27.7041&lng=85.3143&radius=5000'
+      'http://localhost:5012/v1/events/nearby?lat=27.7041&lng=85.3143&radius=5000'
     );
     
     expect(response.ok()).toBeTruthy();
@@ -31,7 +31,7 @@ test.describe('E2E-05: Geo-Based Event Discovery', () => {
   test('should detect constituency from coordinates', async ({ page }) => {
     // Test with Kathmandu coordinates (should be in ktm-1 or ktm-2)
     const response = await page.request.get(
-      'http://localhost:8000/v1/constituencies/detect?lat=27.7172&lng=85.3240'
+      'http://localhost:5012/v1/constituencies/detect?lat=27.7172&lng=85.3240'
     );
     
     expect(response.ok()).toBeTruthy();
@@ -46,7 +46,7 @@ test.describe('E2E-05: Geo-Based Event Discovery', () => {
   test('should return 404 for coordinates outside all constituencies', async ({ page }) => {
     // Test with coordinates far outside Nepal
     const response = await page.request.get(
-      'http://localhost:8000/v1/constituencies/detect?lat=26.0&lng=84.0'
+      'http://localhost:5012/v1/constituencies/detect?lat=26.0&lng=84.0'
     );
     
     expect(response.status()).toBe(404);
@@ -55,7 +55,7 @@ test.describe('E2E-05: Geo-Based Event Discovery', () => {
   test('should respect radius parameter in nearby search', async ({ page }) => {
     // Search with small radius (100m)
     const smallRadiusResponse = await page.request.get(
-      'http://localhost:8000/v1/events/nearby?lat=27.7041&lng=85.3143&radius=100'
+      'http://localhost:5012/v1/events/nearby?lat=27.7041&lng=85.3143&radius=100'
     );
     
     expect(smallRadiusResponse.ok()).toBeTruthy();
@@ -63,7 +63,7 @@ test.describe('E2E-05: Geo-Based Event Discovery', () => {
     
     // Search with large radius (50km)
     const largeRadiusResponse = await page.request.get(
-      'http://localhost:8000/v1/events/nearby?lat=27.7041&lng=85.3143&radius=50000'
+      'http://localhost:5012/v1/events/nearby?lat=27.7041&lng=85.3143&radius=50000'
     );
     
     expect(largeRadiusResponse.ok()).toBeTruthy();

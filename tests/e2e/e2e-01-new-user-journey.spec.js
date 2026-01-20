@@ -87,14 +87,14 @@ test.describe('E2E-01: Complete New User Journey', () => {
 
     // Refetch event to get updated RSVP count from backend
     await page.waitForTimeout(500);
-    const refreshResponse = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    const refreshResponse = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     const refreshedEvent = await refreshResponse.json();
     const countAfter = refreshedEvent.rsvp_count;
     
     expect(countAfter).toBe(countBefore + 1);
 
     // 4. VERIFY DATABASE (via API)
-    const response = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    const response = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     expect(response.ok()).toBeTruthy();
     
     const eventData = await response.json();

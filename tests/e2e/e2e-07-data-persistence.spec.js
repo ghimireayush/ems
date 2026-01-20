@@ -47,12 +47,12 @@ test.describe('E2E-07: Data Survives Backend Restart', () => {
     await expect(rsvpButton).toContainText("You're Going", { timeout: 10000 });
 
     // Get initial RSVP count
-    const initialCountResponse = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    const initialCountResponse = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     const initialEvent = await initialCountResponse.json();
     const countBeforeRestart = initialEvent.rsvp_count;
 
     // Get user ID from API
-    const userResponse = await page.request.get('http://localhost:8000/v1/users/me', {
+    const userResponse = await page.request.get('http://localhost:5012/v1/users/me', {
       headers: {
         'Authorization': `Bearer ${await page.evaluate(() => localStorage.getItem('nepal_elections_token'))}`
       }
@@ -68,7 +68,7 @@ test.describe('E2E-07: Data Survives Backend Restart', () => {
     let healthy = false;
     for (let i = 0; i < 60; i++) {
       try {
-        const healthResponse = await page.request.get('http://localhost:8000/health', {
+        const healthResponse = await page.request.get('http://localhost:5012/health', {
           timeout: 5000
         });
         if (healthResponse.ok()) {
@@ -130,7 +130,7 @@ test.describe('E2E-07: Data Survives Backend Restart', () => {
     await page.waitForTimeout(2000);
 
     // Verify it's the same user
-    const reloginUserResponse = await page.request.get('http://localhost:8000/v1/users/me', {
+    const reloginUserResponse = await page.request.get('http://localhost:5012/v1/users/me', {
       headers: {
         'Authorization': `Bearer ${newToken}`
       }
@@ -139,7 +139,7 @@ test.describe('E2E-07: Data Survives Backend Restart', () => {
     expect(reloginUserData.id).toBe(userId);
 
     // Verify RSVP still exists
-    const rsvpsResponse = await page.request.get('http://localhost:8000/v1/users/me/rsvps', {
+    const rsvpsResponse = await page.request.get('http://localhost:5012/v1/users/me/rsvps', {
       headers: {
         'Authorization': `Bearer ${newToken}`
       }
@@ -149,7 +149,7 @@ test.describe('E2E-07: Data Survives Backend Restart', () => {
     expect(hasRsvp).toBeTruthy();
 
     // Verify RSVP count unchanged
-    const finalCountResponse = await page.request.get(`http://localhost:8000/v1/events/${eventId}`);
+    const finalCountResponse = await page.request.get(`http://localhost:5012/v1/events/${eventId}`);
     const finalEvent = await finalCountResponse.json();
     expect(finalEvent.rsvp_count).toBe(countBeforeRestart);
 
