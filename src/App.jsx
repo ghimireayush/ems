@@ -6,10 +6,12 @@ import { EventDetail } from './components/Events/EventDetail';
 import { FilterBar } from './components/Layout/FilterBar';
 import { LoginModal, UserMenu } from './components/Auth/Login';
 import { dataProvider } from './api/dataProvider';
+import PWAUpdatePrompt from './components/PWAUpdatePrompt';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
+import OfflineIndicator from './components/OfflineIndicator';
 
 function AppContent() {
   const { state, actions } = useApp();
-  const [activePanel, setActivePanel] = useState('list');
   const [showLogin, setShowLogin] = useState(false);
   const [user, setUser] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -24,15 +26,28 @@ function AppContent() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const newIsMobile = window.innerWidth <= 768;
+      setIsMobile(newIsMobile);
+      
+      // Force re-render of mobile-specific styles
+      if (newIsMobile !== isMobile) {
+        // Trigger a small delay to ensure proper re-rendering
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 100);
+      }
     };
+    
     window.addEventListener('resize', handleResize);
+    
+    // Initial check
+    handleResize();
+    
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isMobile]);
 
   const handleEventSelect = (event) => {
     actions.selectEvent(event);
-    if (event) setActivePanel('detail');
   };
 
   const handleLogin = (loggedInUser) => {
@@ -69,7 +84,7 @@ function AppContent() {
         <div className="loader-icon" style={{ 
           fontSize: 80, 
           marginBottom: 32,
-        }}>🗳️</div>
+        }}>Loading</div>
         <div style={{ 
           fontSize: 24, 
           color: 'white',
@@ -116,7 +131,7 @@ function AppContent() {
           maxWidth: 420,
           animation: 'slideInUp 0.4s ease-out',
         }}>
-          <div style={{ fontSize: 72, marginBottom: 24 }}>⚠️</div>
+          <div style={{ fontSize: 72, marginBottom: 24 }}>!</div>
           <h2 style={{ 
             fontSize: 24, 
             fontWeight: 700, 
@@ -180,6 +195,8 @@ function AppContent() {
           justifyContent: 'space-between',
           boxShadow: '0 4px 20px rgba(102, 126, 234, 0.25)',
           backdropFilter: 'blur(10px)',
+          position: 'relative',
+          zIndex: 'var(--z-header)',
         }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h1 style={{ 
@@ -195,7 +212,7 @@ function AppContent() {
             textOverflow: 'ellipsis',
           }}>
             <span style={{ fontSize: isMobile ? 20 : 28 }}>🗳️</span>
-            {isMobile ? 'Nepal 2026' : 'Nepal Elections 2026'}
+            Nepal Elections 2026
           </h1>
           {!isMobile && (
             <p style={{ 
@@ -220,7 +237,7 @@ function AppContent() {
               alignItems: 'center',
               gap: 6,
             }}>
-              <span>📅</span>
+              <span></span>
               March 5, 2026
             </div>
           )}
@@ -253,7 +270,7 @@ function AppContent() {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              {isMobile ? '🔐' : '🔐 Login'}
+              {isMobile ? 'Login' : 'Login'}
             </button>
           )}
         </div>
@@ -264,145 +281,164 @@ function AppContent() {
 
       {/* Main content */}
       {isMobile ? (
-        /* Mobile Layout - Stacked with toggle */
+        /* Mobile Layout - Optimized for performance and UX */
         <div style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
         }}>
-          {/* Mobile view toggle */}
+          {/* Mobile view toggle - Sticky and optimized */}
           <div style={{
             display: 'flex',
             background: 'white',
             borderBottom: '1px solid #e8e8e8',
             position: 'sticky',
             top: 0,
-            zIndex: 20,
+            zIndex: 'var(--z-content)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
           }}>
             <button
               onClick={() => setMobileView('list')}
               style={{
                 flex: 1,
-                padding: '12px',
+                padding: '16px 12px',
                 background: mobileView === 'list' ? '#667eea' : 'white',
                 color: mobileView === 'list' ? 'white' : '#666',
                 border: 'none',
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 600,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
+                position: 'relative',
+                minHeight: 56,
               }}
             >
-              📋 List
+              📋 Events
+              {mobileView === 'list' && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 40,
+                  height: 3,
+                  background: 'white',
+                  borderRadius: '3px 3px 0 0',
+                }}></div>
+              )}
             </button>
             <button
               onClick={() => setMobileView('map')}
               style={{
                 flex: 1,
-                padding: '12px',
+                padding: '16px 12px',
                 background: mobileView === 'map' ? '#667eea' : 'white',
                 color: mobileView === 'map' ? 'white' : '#666',
                 border: 'none',
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 600,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
+                position: 'relative',
+                minHeight: 56,
               }}
             >
               🗺️ Map
+              {mobileView === 'map' && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 40,
+                  height: 3,
+                  background: 'white',
+                  borderRadius: '3px 3px 0 0',
+                }}></div>
+              )}
             </button>
           </div>
 
-          {/* Mobile content */}
-          {mobileView === 'list' ? (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              {/* Panel tabs */}
-              <div style={{
-                display: 'flex',
-                borderBottom: '1px solid #e8e8e8',
-                background: '#fafafa',
-                padding: '0 4px',
-                gap: 4,
+          {/* Mobile content with optimized transitions */}
+          <div style={{ 
+            flex: 1, 
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            {mobileView === 'list' ? (
+              <div 
+                className="mobile-scroll"
+                style={{ 
+                  height: '100%',
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  background: 'white',
+                }}
+              >
+                {/* Show event list or detail based on selection */}
+                <div 
+                  className="mobile-scroll"
+                  style={{ 
+                    flex: 1, 
+                    overflow: 'auto',
+                    background: 'white',
+                    WebkitOverflowScrolling: 'touch',
+                  }}
+                >
+                  {state.selectedEvent ? (
+                    <EventDetail 
+                      user={user} 
+                      onLoginRequired={() => setShowLogin(true)}
+                      isMobile={isMobile}
+                    />
+                  ) : (
+                    <EventList onSelectEvent={handleEventSelect} isMobile={isMobile} />
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div style={{ 
+                height: '100%',
+                position: 'relative',
+                background: '#f5f5f5',
               }}>
+                <EventMap />
+                
+                {/* Floating action button for mobile map */}
                 <button
-                  onClick={() => setActivePanel('list')}
+                  onClick={() => setMobileView('list')}
                   style={{
-                    flex: 1,
-                    padding: '12px',
-                    background: activePanel === 'list' ? 'white' : 'transparent',
+                    position: 'absolute',
+                    bottom: 20,
+                    right: 20,
+                    width: 56,
+                    height: 56,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
                     border: 'none',
-                    borderRadius: '10px 10px 0 0',
+                    boxShadow: '0 4px 16px rgba(102, 126, 234, 0.4)',
                     cursor: 'pointer',
-                    fontWeight: activePanel === 'list' ? 600 : 500,
-                    fontSize: 14,
-                    color: activePanel === 'list' ? '#667eea' : '#666',
-                    transition: 'all 0.3s ease',
-                    position: 'relative',
+                    fontSize: 20,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 'var(--z-content)',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onTouchStart={(e) => {
+                    e.currentTarget.style.transform = 'scale(0.95)';
+                  }}
+                  onTouchEnd={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                 >
-                  📋 Events
-                  {activePanel === 'list' && (
-                    <div style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: 3,
-                      background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                      borderRadius: '3px 3px 0 0',
-                    }}></div>
-                  )}
-                </button>
-                <button
-                  onClick={() => setActivePanel('detail')}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    background: activePanel === 'detail' ? 'white' : 'transparent',
-                    border: 'none',
-                    borderRadius: '10px 10px 0 0',
-                    cursor: 'pointer',
-                    fontWeight: activePanel === 'detail' ? 600 : 500,
-                    fontSize: 14,
-                    color: activePanel === 'detail' ? '#667eea' : '#666',
-                    transition: 'all 0.3s ease',
-                    position: 'relative',
-                  }}
-                >
-                  ℹ️ Details
-                  {activePanel === 'detail' && (
-                    <div style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: 3,
-                      background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                      borderRadius: '3px 3px 0 0',
-                    }}></div>
-                  )}
+                  📋
                 </button>
               </div>
-
-              {/* Panel content */}
-              <div style={{ flex: 1, overflow: 'hidden', background: 'white' }}>
-                {activePanel === 'list' ? (
-                  <EventList onSelectEvent={handleEventSelect} isMobile={isMobile} />
-                ) : (
-                  <EventDetail 
-                    user={user} 
-                    onLoginRequired={() => setShowLogin(true)}
-                    isMobile={isMobile}
-                  />
-                )}
-              </div>
-            </div>
-          ) : (
-            <div style={{ flex: 1, position: 'relative' }}>
-              <EventMap />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       ) : (
         /* Desktop Layout - Side by side */
@@ -421,105 +457,18 @@ function AppContent() {
               flexDirection: 'column',
               background: 'white',
               boxShadow: '2px 0 12px rgba(0, 0, 0, 0.08)',
-              zIndex: 10,
+              zIndex: 'var(--z-content)',
             }}>
-            {/* Panel tabs */}
-            <div style={{
-              display: 'flex',
-              borderBottom: '1px solid #e8e8e8',
-              background: '#fafafa',
-              padding: '0 4px',
-              gap: 4,
-            }}>
-              <button
-                onClick={() => setActivePanel('list')}
-                style={{
-                  flex: 1,
-                  padding: '14px 16px',
-                  background: activePanel === 'list' ? 'white' : 'transparent',
-                  border: 'none',
-                  borderRadius: '10px 10px 0 0',
-                  cursor: 'pointer',
-                  fontWeight: activePanel === 'list' ? 600 : 500,
-                  fontSize: 14,
-                  color: activePanel === 'list' ? '#667eea' : '#666',
-                  transition: 'all 0.3s ease',
-                  position: 'relative',
-                }}
-                onMouseEnter={(e) => {
-                  if (activePanel !== 'list') {
-                    e.currentTarget.style.background = 'rgba(102, 126, 234, 0.05)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activePanel !== 'list') {
-                    e.currentTarget.style.background = 'transparent';
-                  }
-                }}
-              >
-                📋 Events
-                {activePanel === 'list' && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 3,
-                    background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                    borderRadius: '3px 3px 0 0',
-                  }}></div>
-                )}
-              </button>
-              <button
-                onClick={() => setActivePanel('detail')}
-                style={{
-                  flex: 1,
-                  padding: '14px 16px',
-                  background: activePanel === 'detail' ? 'white' : 'transparent',
-                  border: 'none',
-                  borderRadius: '10px 10px 0 0',
-                  cursor: 'pointer',
-                  fontWeight: activePanel === 'detail' ? 600 : 500,
-                  fontSize: 14,
-                  color: activePanel === 'detail' ? '#667eea' : '#666',
-                  transition: 'all 0.3s ease',
-                  position: 'relative',
-                }}
-                onMouseEnter={(e) => {
-                  if (activePanel !== 'detail') {
-                    e.currentTarget.style.background = 'rgba(102, 126, 234, 0.05)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activePanel !== 'detail') {
-                    e.currentTarget.style.background = 'transparent';
-                  }
-                }}
-              >
-                ℹ️ Details
-                {activePanel === 'detail' && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 3,
-                    background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                    borderRadius: '3px 3px 0 0',
-                  }}></div>
-                )}
-              </button>
-            </div>
-
-            {/* Panel content */}
+            
+            {/* Panel content - Show list or detail based on selection */}
             <div style={{ flex: 1, overflow: 'hidden' }}>
-              {activePanel === 'list' ? (
-                <EventList onSelectEvent={handleEventSelect} />
-              ) : (
+              {state.selectedEvent ? (
                 <EventDetail 
                   user={user} 
                   onLoginRequired={() => setShowLogin(true)} 
                 />
+              ) : (
+                <EventList onSelectEvent={handleEventSelect} />
               )}
             </div>
           </div>
@@ -541,6 +490,11 @@ function AppContent() {
           onLogin={handleLogin}
         />
       </div>
+
+      {/* PWA Components */}
+      <OfflineIndicator />
+      <PWAUpdatePrompt />
+      <PWAInstallPrompt />
     </div>
   );
 }

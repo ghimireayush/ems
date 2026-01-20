@@ -527,7 +527,7 @@ function output(filename, content) {
     }
     const filepath = path.join(dir, filename);
     fs.writeFileSync(filepath, content);
-    console.error(`✓ Written: ${filepath}`);
+    console.error(`Written: ${filepath}`);
   } else {
     console.log(content);
   }
@@ -546,7 +546,7 @@ function main() {
   }
   
   if (CONFIG.outputDir) {
-    console.error('\n✓ Database scripts generated successfully');
+    console.error('\nDatabase scripts generated successfully');
     console.error('\nTo apply:');
     console.error(`  psql -d your_database -f ${CONFIG.outputDir}/001_schema.sql`);
     console.error(`  psql -d your_database -f ${CONFIG.outputDir}/002_seed.sql`);

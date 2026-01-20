@@ -33,7 +33,7 @@ VALUES (
   1991,
   'sun',
   'https://cpnuml.org',
-  'cpnuml.png.png'
+  'cpnuml.png'
 );
 
 INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
