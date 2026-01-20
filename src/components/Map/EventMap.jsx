@@ -159,11 +159,11 @@ export function EventMap() {
                 )}
                 
                 <div style={{ fontSize: 13, color: '#666' }}>
-                  📍 {event.venue.name}
+                  {event.venue.name}
                   <br />
-                  🕐 {formatTime(event.datetime)}
+                  {formatTime(event.datetime)}
                   <br />
-                  👥 {event.rsvpCount} RSVPs
+                  {event.rsvpCount} RSVPs
                 </div>
               </div>
             </Popup>

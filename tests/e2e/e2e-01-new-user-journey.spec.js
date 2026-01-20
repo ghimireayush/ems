@@ -82,7 +82,7 @@ test.describe('E2E-01: Complete New User Journey', () => {
     // Click RSVP
     await rsvpButton.click();
 
-    // Verify button changes to "✓ You're Going!" - wait for state change
+    // Verify button changes to "You're Going!" - wait for state change
     await expect(rsvpButton).toContainText("You're Going", { timeout: 10000 });
 
     // Refetch event to get updated RSVP count from backend

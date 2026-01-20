@@ -39,26 +39,30 @@ export function EventList({ onSelectEvent, isMobile }) {
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }} data-testid="event-list">
-      {/* Search and filters */}
+      {/* Search and filters - Mobile optimized */}
       <div style={{ 
-        padding: isMobile ? '12px 12px' : '14px 16px', 
+        padding: isMobile ? '16px' : '14px 16px', 
         borderBottom: '1px solid #e8e8e8',
         background: '#fafafa',
+        position: 'sticky',
+        top: 0,
+        zIndex: 'var(--z-content)',
       }}>
         <input
           type="text"
-          placeholder="🔍 Search events..."
+          placeholder={isMobile ? "Search events..." : "Search events..."}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
             width: '100%',
-            padding: isMobile ? '12px 16px' : '10px 14px',
+            padding: isMobile ? '14px 16px' : '10px 14px',
             border: '1px solid #e0e0e0',
-            borderRadius: 8,
-            fontSize: isMobile ? 16 : 14,
-            marginBottom: isMobile ? 12 : 10,
+            borderRadius: isMobile ? 12 : 8,
+            fontSize: 16, // Always 16px to prevent zoom on iOS
+            marginBottom: isMobile ? 16 : 10,
             background: 'white',
             transition: 'all 0.2s ease',
+            boxSizing: 'border-box',
             minHeight: isMobile ? 48 : 'auto',
           }}
           onFocus={(e) => {
@@ -71,78 +75,89 @@ export function EventList({ onSelectEvent, isMobile }) {
           }}
         />
         
-        <div style={{ display: 'flex', gap: isMobile ? 6 : 8, alignItems: 'center', flexWrap: isMobile ? 'nowrap' : 'wrap' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: isMobile ? 12 : 8, 
+          alignItems: 'center', 
+          flexWrap: isMobile ? 'wrap' : 'nowrap',
+          justifyContent: 'space-between',
+        }}>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             style={{ 
-              padding: isMobile ? '10px 12px' : '8px 10px', 
-              borderRadius: 6, 
+              padding: isMobile ? '12px 16px' : '8px 10px', 
+              borderRadius: isMobile ? 8 : 6, 
               border: '1px solid #e0e0e0',
-              fontSize: isMobile ? 14 : 13,
+              fontSize: isMobile ? 15 : 13,
               fontWeight: 500,
               background: 'white',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              minHeight: isMobile ? 40 : 'auto',
               flexShrink: 0,
+              minHeight: isMobile ? 44 : 'auto',
             }}
           >
-            <option value="date">📅 Sort by Date</option>
-            <option value="distance" disabled={!location}>📍 Sort by Distance</option>
+            <option value="date">{isMobile ? '📅 By Date' : 'Sort by Date'}</option>
+            <option value="distance" disabled={!location}>{isMobile ? '📍 By Distance' : 'Sort by Distance'}</option>
           </select>
           
-          <span style={{ 
-            fontSize: isMobile ? 13 : 12, 
-            color: '#999',
-            fontWeight: 500,
-            marginLeft: 'auto',
-            whiteSpace: 'nowrap',
+          <div style={{ 
+            display: 'flex',
+            alignItems: 'center',
+            gap: isMobile ? 12 : 8,
+            flexWrap: 'wrap',
           }}>
-            {displayEvents.length} of {totalCount}
-          </span>
-          
-          {Object.values(state.filters).some(v => v !== null) && (
-            <button
-              onClick={() => actions.clearFilters()}
-              style={{
-                padding: isMobile ? '8px 12px' : '6px 12px',
-                background: 'white',
-                border: '1px solid #e0e0e0',
-                borderRadius: 6,
-                fontSize: isMobile ? 14 : 12,
-                cursor: 'pointer',
-                fontWeight: 500,
-                color: '#666',
-                transition: 'all 0.2s ease',
-                minHeight: isMobile ? 36 : 'auto',
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f5f5f5';
-                e.currentTarget.style.borderColor = '#d0d0d0';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'white';
-                e.currentTarget.style.borderColor = '#e0e0e0';
-              }}
-            >
-              ✕ Clear
-            </button>
-          )}
+            <span style={{ 
+              fontSize: isMobile ? 14 : 12, 
+              color: '#999',
+              fontWeight: 500,
+              whiteSpace: 'nowrap',
+            }}>
+              {displayEvents.length} of {totalCount}
+            </span>
+            
+            {Object.values(state.filters).some(v => v !== null) && (
+              <button
+                onClick={() => actions.clearFilters()}
+                style={{
+                  padding: isMobile ? '10px 16px' : '6px 12px',
+                  background: '#ff5722',
+                  border: 'none',
+                  borderRadius: isMobile ? 8 : 6,
+                  fontSize: isMobile ? 14 : 12,
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  color: 'white',
+                  transition: 'all 0.2s ease',
+                  flexShrink: 0,
+                  minHeight: isMobile ? 40 : 'auto',
+                }}
+              >
+                {isMobile ? '🗑️ Clear' : 'Clear'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Event list */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      {/* Event list - Mobile optimized scrolling */}
+      <div 
+        className={isMobile ? 'mobile-scroll' : ''}
+        style={{ 
+          flex: 1, 
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
         {sortBy === 'date' && groupedEvents ? (
           groupedEvents.map(group => (
             <div key={group.date}>
               <div style={{
-                padding: '10px 16px',
+                padding: isMobile ? '12px 16px' : '10px 16px',
                 background: '#f8f9fa',
                 fontWeight: 600,
-                fontSize: 12,
+                fontSize: isMobile ? 13 : 12,
                 position: 'sticky',
                 top: 0,
                 borderBottom: '1px solid #e8e8e8',
@@ -151,7 +166,11 @@ export function EventList({ onSelectEvent, isMobile }) {
                 letterSpacing: '0.5px',
                 zIndex: 5,
               }}>
-                {getRelativeDate(group.date)} — {formatDate(group.date, { weekday: 'long', month: 'short', day: 'numeric' })}
+                {getRelativeDate(group.date)} — {formatDate(group.date, { 
+                  weekday: isMobile ? 'short' : 'long', 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
               </div>
               {group.events.map(event => (
                 <EventCard 
@@ -179,7 +198,7 @@ export function EventList({ onSelectEvent, isMobile }) {
 
         {displayEvents.length === 0 && (
           <div style={{ 
-            padding: 32, 
+            padding: isMobile ? 48 : 32, 
             textAlign: 'center', 
             color: '#999',
             display: 'flex',
@@ -187,10 +206,11 @@ export function EventList({ onSelectEvent, isMobile }) {
             alignItems: 'center',
             justifyContent: 'center',
             height: '100%',
+            minHeight: isMobile ? 200 : 'auto',
           }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-            <div style={{ fontWeight: 500 }}>No events found</div>
-            <div style={{ fontSize: 12, marginTop: 4 }}>Try adjusting your filters</div>
+            <div style={{ fontSize: isMobile ? 48 : 40, marginBottom: 16 }}>🔍</div>
+            <div style={{ fontWeight: 600, fontSize: isMobile ? 18 : 16, marginBottom: 8 }}>No events found</div>
+            <div style={{ fontSize: isMobile ? 14 : 12, color: '#666' }}>Try adjusting your filters or search terms</div>
           </div>
         )}
       </div>
@@ -206,7 +226,7 @@ function EventCard({ event, isSelected, onSelect, showDistance, isMobile }) {
       data-testid={`event-item-${event.id}`}
       onClick={onSelect}
       style={{
-        padding: isMobile ? '16px 12px' : '14px 16px',
+        padding: isMobile ? '20px 16px' : '14px 16px',
         borderBottom: '1px solid #f0f0f0',
         cursor: 'pointer',
         background: isSelected 
@@ -215,37 +235,31 @@ function EventCard({ event, isSelected, onSelect, showDistance, isMobile }) {
             ? '#f8f9fa'
             : 'white',
         transition: 'all 0.2s ease',
-        borderLeft: isSelected ? '3px solid #667eea' : '3px solid transparent',
-        paddingLeft: isSelected ? (isMobile ? 9 : 13) : (isMobile ? 12 : 16),
-        minHeight: isMobile ? 80 : 'auto',
+        borderLeft: isSelected ? '4px solid #667eea' : '4px solid transparent',
+        paddingLeft: isSelected ? (isMobile ? 12 : 12) : (isMobile ? 16 : 16),
+        minHeight: isMobile ? 100 : 'auto',
+        position: 'relative',
+        // Optimize for touch
+        WebkitTapHighlightColor: 'rgba(102, 126, 234, 0.1)',
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => !isMobile && setIsHovered(true)}
+      onMouseLeave={() => !isMobile && setIsHovered(false)}
+      onTouchStart={() => isMobile && setIsHovered(true)}
+      onTouchEnd={() => isMobile && setIsHovered(false)}
     >
-      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-        {/* Type icon */}
-        <div style={{ 
-          fontSize: isMobile ? 32 : 28, 
-          width: isMobile ? 44 : 40, 
-          textAlign: 'center',
-          flexShrink: 0,
-          marginTop: 2,
-        }}>
-          {eventTypeIcons[event.type]}
-        </div>
-        
+      <div style={{ display: 'flex', gap: isMobile ? 16 : 12, alignItems: 'flex-start' }}>
         {/* Content */}
         <div style={{ flex: 1, minWidth: 0 }}>
           {/* Title row */}
           <div style={{ 
             fontWeight: 600, 
-            marginBottom: 6,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            fontSize: isMobile ? 15 : 14,
+            marginBottom: isMobile ? 8 : 6,
+            fontSize: isMobile ? 16 : 14,
             color: '#1a1a1a',
-            lineHeight: isMobile ? 1.3 : 1.4,
+            lineHeight: 1.3,
+            // Better text handling for mobile
+            wordBreak: 'break-word',
+            hyphens: 'auto',
           }}>
             {event.title}
           </div>
@@ -255,14 +269,14 @@ function EventCard({ event, isSelected, onSelect, showDistance, isMobile }) {
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 5,
-              padding: isMobile ? '5px 10px' : '4px 8px',
+              gap: isMobile ? 6 : 5,
+              padding: isMobile ? '6px 12px' : '4px 8px',
               background: getPartyColor(event.party, 0.12),
               color: event.party.color,
-              borderRadius: 5,
-              fontSize: isMobile ? 12 : 11,
+              borderRadius: isMobile ? 8 : 5,
+              fontSize: isMobile ? 13 : 11,
               fontWeight: 600,
-              marginBottom: 6,
+              marginBottom: isMobile ? 10 : 6,
               border: `1px solid ${getPartyColor(event.party, 0.3)}`,
             }}>
               {event.party.logoUrl && (
@@ -270,8 +284,8 @@ function EventCard({ event, isSelected, onSelect, showDistance, isMobile }) {
                   src={`/${event.party.logoUrl}`}
                   alt={event.party.shortName}
                   style={{
-                    width: isMobile ? 16 : 14,
-                    height: isMobile ? 16 : 14,
+                    width: isMobile ? 18 : 14,
+                    height: isMobile ? 18 : 14,
                     objectFit: 'contain',
                   }}
                 />
@@ -281,34 +295,95 @@ function EventCard({ event, isSelected, onSelect, showDistance, isMobile }) {
           )}
           
           {/* Details */}
-          <div style={{ fontSize: isMobile ? 13 : 12, color: '#666', lineHeight: 1.6 }}>
-            <div>📍 {event.venue?.name || 'TBD'}</div>
-            <div>🕐 {formatTime(event.datetime)}</div>
+          <div style={{ 
+            fontSize: isMobile ? 14 : 12, 
+            color: '#666', 
+            lineHeight: isMobile ? 1.5 : 1.6,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: isMobile ? 4 : 2,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>📍</span>
+              <span style={{ 
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flex: 1,
+              }}>
+                {event.venue?.name || 'TBD'}
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>🕐</span>
+              <span>{formatTime(event.datetime)}</span>
+              <span style={{ marginLeft: 4 }}>{eventTypeIcons[event.type]}</span>
+            </div>
             {showDistance && event.distance !== null && (
-              <div>📏 {formatDistance(event.distance)} away</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span>📏</span>
+                <span>{formatDistance(event.distance)} away</span>
+              </div>
             )}
           </div>
         </div>
         
-        {/* RSVP count */}
+        {/* RSVP count - Mobile optimized */}
         <div style={{ 
-          textAlign: 'right',
+          textAlign: 'center',
           flexShrink: 0,
-          fontSize: isMobile ? 13 : 12,
+          fontSize: isMobile ? 14 : 12,
           color: '#666',
           background: isSelected ? 'rgba(102, 126, 234, 0.1)' : '#f8f9fa',
-          padding: isMobile ? '10px 12px' : '8px 10px',
-          borderRadius: 6,
-          minWidth: isMobile ? 60 : 50,
-          minHeight: isMobile ? 48 : 'auto',
+          padding: isMobile ? '12px 16px' : '8px 10px',
+          borderRadius: isMobile ? 12 : 6,
+          minWidth: isMobile ? 70 : 50,
+          minHeight: isMobile ? 60 : 'auto',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
+          alignItems: 'center',
+          border: isSelected ? '1px solid rgba(102, 126, 234, 0.2)' : '1px solid #f0f0f0',
         }}>
-          <div style={{ fontWeight: 700, color: '#667eea', fontSize: isMobile ? 18 : 16 }}>{event.rsvpCount}</div>
-          <div style={{ fontSize: isMobile ? 11 : 10, color: '#999', marginTop: 2 }}>RSVPs</div>
+          <div style={{ 
+            fontWeight: 700, 
+            color: '#667eea', 
+            fontSize: isMobile ? 20 : 16,
+            lineHeight: 1,
+          }}>
+            {event.rsvpCount}
+          </div>
+          <div style={{ 
+            fontSize: isMobile ? 12 : 10, 
+            color: '#999', 
+            marginTop: isMobile ? 4 : 2,
+            fontWeight: 500,
+          }}>
+            RSVPs
+          </div>
         </div>
       </div>
+      
+      {/* Mobile selection indicator */}
+      {isMobile && isSelected && (
+        <div style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          width: 24,
+          height: 24,
+          borderRadius: '50%',
+          background: '#667eea',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 12,
+          fontWeight: 600,
+        }}>
+          ✓
+        </div>
+      )}
     </div>
   );
 }

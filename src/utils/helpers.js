@@ -52,14 +52,14 @@ export function formatDistance(km) {
 
 // Event type icons (using simple unicode for now)
 export const eventTypeIcons = {
-  rally: '📢',
-  townhall: '🏛️',
-  march: '🚶',
-  meeting: '🤝',
-  assembly: '👥',
-  canvassing: '🚪',
-  conference: '📋',
-  debate: '💬',
+  rally: '',
+  townhall: '',
+  march: '',
+  meeting: '',
+  assembly: '',
+  canvassing: '',
+  conference: '',
+  debate: '',
 };
 
 // Party color utilities
