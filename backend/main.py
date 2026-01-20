@@ -28,7 +28,7 @@ DATABASE_URL = os.environ.get(
 
 # For Docker: use service name
 if os.environ.get("DOCKER_ENV"):
-    DATABASE_URL = "postgresql://nepal:nepal2026@db:5436/nepal_elections"
+    DATABASE_URL = "postgresql://nepal:nepal2026@db:5432/nepal_elections"
 
 # ============================================================================
 # DATABASE CONNECTION
