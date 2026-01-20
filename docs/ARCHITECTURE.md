@@ -262,7 +262,7 @@ psql -d nepal_elections -f sql/002_seed.sql
 
 ## Next Steps
 
-1. **Phase 1 (Now):** Frontend prototype with JSON data ✅
+1. **Phase 1 (Now):** Frontend prototype with JSON data
 2. **Phase 2:** Implement backend from OpenAPI spec
 3. **Phase 3:** Real constituency GeoJSON (165 boundaries)
 4. **Phase 4:** SMS integration (Sparrow SMS)

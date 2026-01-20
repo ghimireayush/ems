@@ -208,7 +208,7 @@ This document defines the core use cases for the Nepal Elections 2026 citizen pl
 5. Backend inserts record into `rsvps` table
 6. Database trigger fires, increments `events.rsvp_count`
 7. Backend returns new rsvp_count
-8. UI updates button to "✓ You're Going!"
+8. UI updates button to "You're Going!"
 9. UI updates displayed RSVP count
 
 **Postconditions:**
@@ -229,7 +229,7 @@ This document defines the core use cases for the Nepal Elections 2026 citizen pl
 
 **Flow:**
 1. Citizen views event detail
-2. Button shows "🔐 Login to RSVP"
+2. Button shows "Login to RSVP"
 3. Citizen clicks button
 4. Login modal opens
 5. Citizen completes login flow
@@ -276,7 +276,7 @@ This document defines the core use cases for the Nepal Elections 2026 citizen pl
 
 **Flow:**
 1. Citizen views Event A detail
-2. Button shows "✓ You're Going!" (disabled)
+2. Button shows "You're Going!" (disabled)
 3. If citizen somehow sends another RSVP request:
    - Backend performs UPSERT (ON CONFLICT DO UPDATE)
    - Status updated but no new row created
@@ -371,7 +371,7 @@ Teardown:
 │     ├── Navigate to event detail (if not already there)                     │
 │     ├── Verify: RSVP button now says "RSVP to this Event"                   │
 │     ├── Click RSVP button                                                   │
-│     ├── Verify: Button changes to "✓ You're Going!"                         │
+│     ├── Verify: Button changes to "You're Going!"                         │
 │     └── Verify: RSVP count incremented by 1                                 │
 │                                                                              │
 │  4. VALIDATE DATABASE                                                        │
@@ -386,10 +386,10 @@ Teardown:
 └─────────────────────────────────────────────────────────────────────────────┘
 
 PASS CRITERIA:
-  ✓ User record created in database
-  ✓ RSVP record created in database  
-  ✓ Event rsvp_count accurately reflects 1 RSVP
-  ✓ UI shows consistent state throughout
+  User record created in database
+  RSVP record created in database  
+  Event rsvp_count accurately reflects 1 RSVP
+  UI shows consistent state throughout
 ```
 
 ---
@@ -439,10 +439,10 @@ PASS CRITERIA:
 └─────────────────────────────────────────────────────────────────────────────┘
 
 PASS CRITERIA:
-  ✓ 3 distinct users in users table
-  ✓ 3 RSVP records in rsvps table
-  ✓ events.rsvp_count = 3
-  ✓ COUNT(rsvps) = events.rsvp_count (integrity holds)
+  3 distinct users in users table
+  3 RSVP records in rsvps table
+  events.rsvp_count = 3
+  COUNT(rsvps) = events.rsvp_count (integrity holds)
 ```
 
 ---
@@ -467,7 +467,7 @@ PASS CRITERIA:
 │                                                                              │
 │  FIRST RSVP                                                                  │
 │     ├── RSVP to evt-002                                                     │
-│     ├── Verify: Button shows "✓ You're Going!"                              │
+│     ├── Verify: Button shows "You're Going!"                              │
 │     └── Verify: rsvp_count = 1                                              │
 │                                                                              │
 │  ATTEMPT DUPLICATE (via API)                                                 │
@@ -479,7 +479,7 @@ PASS CRITERIA:
 │  ATTEMPT DUPLICATE (via UI refresh)                                          │
 │     ├── Refresh page                                                        │
 │     ├── Navigate to evt-002                                                 │
-│     ├── Verify: Button still shows "✓ You're Going!"                        │
+│     ├── Verify: Button still shows "You're Going!"                        │
 │     └── Verify: rsvp_count still = 1                                        │
 │                                                                              │
 │  VALIDATE                                                                    │
@@ -492,9 +492,9 @@ PASS CRITERIA:
 └─────────────────────────────────────────────────────────────────────────────┘
 
 PASS CRITERIA:
-  ✓ Only 1 RSVP record exists regardless of attempts
-  ✓ rsvp_count = 1 (no inflation)
-  ✓ UPSERT handles duplicate gracefully
+  Only 1 RSVP record exists regardless of attempts
+  rsvp_count = 1 (no inflation)
+  UPSERT handles duplicate gracefully
 ```
 
 ---
@@ -539,10 +539,10 @@ PASS CRITERIA:
 └─────────────────────────────────────────────────────────────────────────────┘
 
 PASS CRITERIA:
-  ✓ Valid token survives refresh
-  ✓ Logout clears all auth state
-  ✓ Invalid token doesn't crash app
-  ✓ API rejects invalid token with 401
+  Valid token survives refresh
+  Logout clears all auth state
+  Invalid token doesn't crash app
+  API rejects invalid token with 401
 ```
 
 ---
@@ -590,10 +590,10 @@ PASS CRITERIA:
 └─────────────────────────────────────────────────────────────────────────────┘
 
 PASS CRITERIA:
-  ✓ PostGIS ST_DWithin query returns correct events
-  ✓ Distance calculations are accurate (within 10m tolerance)
-  ✓ Constituency detection works for points inside bounds
-  ✓ Constituency detection returns 404 for points outside all bounds
+  PostGIS ST_DWithin query returns correct events
+  Distance calculations are accurate (within 10m tolerance)
+  Constituency detection works for points inside bounds
+  Constituency detection returns 404 for points outside all bounds
 ```
 
 ---
@@ -639,10 +639,10 @@ PASS CRITERIA:
 └─────────────────────────────────────────────────────────────────────────────┘
 
 PASS CRITERIA:
-  ✓ Each filter works independently
-  ✓ Filters combine with AND logic
-  ✓ Empty results handled gracefully
-  ✓ Clear restores full list
+  Each filter works independently
+  Filters combine with AND logic
+  Empty results handled gracefully
+  Clear restores full list
 ```
 
 ---
@@ -674,27 +674,27 @@ PASS CRITERIA:
 │                                                                              │
 │  VERIFY PERSISTENCE                                                          │
 │     ├── SQL: SELECT * FROM users WHERE phone = '+9779800000099';            │
-│     │   └── User still exists ✓                                             │
+│     │   └── User still exists                                             │
 │     ├── SQL: SELECT * FROM rsvps WHERE user_id = '<id>';                    │
-│     │   └── Both RSVPs still exist ✓                                        │
+│     │   └── Both RSVPs still exist                                        │
 │     └── SQL: SELECT rsvp_count FROM events WHERE id IN ('evt-001','evt-002');
-│         └── Counts still correct ✓                                          │
+│         └── Counts still correct                                          │
 │                                                                              │
 │  VERIFY RE-LOGIN                                                             │
 │     ├── UI will show logged out (token invalid after restart)               │
 │     ├── Login again with same phone                                         │
 │     ├── Verify: Same user ID (not new user)                                 │
 │     ├── Navigate to evt-001                                                 │
-│     └── Verify: Button shows "✓ You're Going!" (RSVP recognized)            │
+│     └── Verify: Button shows "You're Going!" (RSVP recognized)            │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 PASS CRITERIA:
-  ✓ User record survives restart
-  ✓ RSVP records survive restart
-  ✓ RSVP counts accurate after restart
-  ✓ Re-login reconnects to same user (no duplicate)
-  ✓ Previous RSVPs recognized after re-login
+  User record survives restart
+  RSVP records survive restart
+  RSVP counts accurate after restart
+  Re-login reconnects to same user (no duplicate)
+  Previous RSVPs recognized after re-login
 ```
 
 ---

@@ -238,7 +238,7 @@ def row_to_party(row: dict) -> dict:
         "founded": row.get("founded"),
         "symbol": row.get("symbol"),
         "website": row.get("website"),
-        "logo_url": row.get("logo_url"),
+        "logoUrl": row.get("logo_url"),
     }
 
 def row_to_constituency(row: dict) -> dict:
@@ -865,14 +865,14 @@ async def get_my_rsvps(user: dict = Depends(require_auth)):
 async def get_event_types():
     """Get event type definitions."""
     return {
-        "rally": {"label": "Rally", "label_nepali": "र्‍याली", "icon": "📢"},
-        "townhall": {"label": "Town Hall", "label_nepali": "टाउन हल", "icon": "🏛️"},
-        "march": {"label": "March", "label_nepali": "मार्च", "icon": "🚶"},
-        "meeting": {"label": "Meeting", "label_nepali": "बैठक", "icon": "🤝"},
-        "assembly": {"label": "Assembly", "label_nepali": "सभा", "icon": "👥"},
-        "canvassing": {"label": "Canvassing", "label_nepali": "घरदैलो", "icon": "🚪"},
-        "conference": {"label": "Conference", "label_nepali": "सम्मेलन", "icon": "🎤"},
-        "debate": {"label": "Debate", "label_nepali": "बहस", "icon": "⚖️"},
+        "rally": {"label": "Rally", "label_nepali": "र्‍याली", "icon": ""},
+        "townhall": {"label": "Town Hall", "label_nepali": "टाउन हल", "icon": ""},
+        "march": {"label": "March", "label_nepali": "मार्च", "icon": ""},
+        "meeting": {"label": "Meeting", "label_nepali": "बैठक", "icon": ""},
+        "assembly": {"label": "Assembly", "label_nepali": "सभा", "icon": ""},
+        "canvassing": {"label": "Canvassing", "label_nepali": "घरदैलो", "icon": ""},
+        "conference": {"label": "Conference", "label_nepali": "सम्मेलन", "icon": ""},
+        "debate": {"label": "Debate", "label_nepali": "बहस", "icon": ""},
     }
 
 # ============================================================================
@@ -909,9 +909,9 @@ async def startup():
             cur = conn.cursor()
             cur.execute("SELECT COUNT(*) FROM parties")
             count = cur.fetchone()["count"]
-            print(f"✓ Database connected. {count} parties loaded.")
+            print(f"Database connected. {count} parties loaded.")
     except Exception as e:
-        print(f"⚠ Database connection failed: {e}")
+        print(f"Database connection failed: {e}")
         print("  API will return errors until database is available.")
 
 if __name__ == "__main__":
