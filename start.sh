@@ -5,25 +5,25 @@
 
 set -e
 
-echo "🗳️  Nepal Elections 2026 - Starting..."
+echo "Nepal Elections 2026 - Starting..."
 echo ""
 
 # Check Docker
 if ! command -v docker &> /dev/null; then
-    echo "❌ Docker not found. Please install Docker first."
+    echo "Docker not found. Please install Docker first."
     exit 1
 fi
 
 if ! command -v docker compose &> /dev/null; then
-    echo "❌ Docker Compose not found. Please install Docker Compose."
+    echo "Docker Compose not found. Please install Docker Compose."
     exit 1
 fi
 
-echo "📦 Building containers..."
+echo "Building containers..."
 docker compose build
 
 echo ""
-echo "🚀 Starting services..."
+echo "Starting services..."
 docker compose up -d
 
 echo ""
@@ -44,11 +44,11 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
 done
 
 echo ""
-echo "✅ All services started!"
+echo "All services started!"
 echo ""
-echo "   🌐 Frontend:  http://localhost:3000"
-echo "   🔌 API:       http://localhost:8000"
-echo "   🗄️  Database:  localhost:5432"
+echo "   Frontend:  http://localhost:3000"
+echo "   API:       http://localhost:8000"
+echo "   Database:  localhost:5432"
 echo ""
 echo "Commands:"
 echo "   docker compose logs -f    # View logs"

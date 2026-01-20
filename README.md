@@ -124,4 +124,4 @@ Open http://localhost:5173
 
 ---
 
-Built for Nepal 🇳🇵
+Built for Nepal
