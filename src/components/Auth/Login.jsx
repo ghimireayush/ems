@@ -79,7 +79,7 @@ export function LoginModal({ isOpen, onClose, onLogin }) {
           marginBottom: 24,
         }}>
           <h2 style={{ margin: 0, fontSize: 20 }}>
-            {step === 'phone' ? '🗳️ Login' : '🔐 Enter OTP'}
+            {step === 'phone' ? 'Login' : 'Enter OTP'}
           </h2>
           <button
             onClick={onClose}
@@ -272,7 +272,7 @@ export function LoginModal({ isOpen, onClose, onLogin }) {
   );
 }
 
-export function UserMenu({ user, onLogout }) {
+export function UserMenu({ user, onLogout, isMobile }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -283,19 +283,19 @@ export function UserMenu({ user, onLogout }) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          padding: '6px 12px',
+          gap: isMobile ? 6 : 8,
+          padding: isMobile ? '6px 10px' : '6px 12px',
           background: 'rgba(255,255,255,0.2)',
           border: 'none',
           borderRadius: 6,
           color: 'white',
           cursor: 'pointer',
-          fontSize: 14,
+          fontSize: isMobile ? 13 : 14,
         }}
       >
         <span style={{
-          width: 28,
-          height: 28,
+          width: isMobile ? 24 : 28,
+          height: isMobile ? 24 : 28,
           background: 'rgba(255,255,255,0.3)',
           borderRadius: '50%',
           display: 'flex',
@@ -304,51 +304,73 @@ export function UserMenu({ user, onLogout }) {
         }}>
           👤
         </span>
-        <span>{user.name || user.phone}</span>
+        {!isMobile && <span>{user.name || user.phone}</span>}
         <span>{isOpen ? '▲' : '▼'}</span>
       </button>
 
       {isOpen && (
-        <div style={{
-          position: 'absolute',
-          top: '100%',
-          right: 0,
-          marginTop: 4,
-          background: 'white',
-          borderRadius: 8,
-          boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-          minWidth: 180,
-          overflow: 'hidden',
-          zIndex: 100,
-        }}>
-          <div style={{
-            padding: 12,
-            borderBottom: '1px solid #eee',
-            fontSize: 13,
-          }}>
-            <div style={{ fontWeight: 600 }}>{user.name || 'Citizen'}</div>
-            <div style={{ color: '#666' }}>{user.phone}</div>
-          </div>
-          <button
-            onClick={() => {
-              setIsOpen(false);
-              onLogout();
-            }}
-            data-testid="logout-button"
+        <>
+          {/* Backdrop to close dropdown when clicking outside */}
+          <div 
             style={{
-              width: '100%',
-              padding: 12,
-              background: 'none',
-              border: 'none',
-              textAlign: 'left',
-              cursor: 'pointer',
-              fontSize: 14,
-              color: '#d32f2f',
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 'calc(var(--z-dropdown) - 1)',
             }}
-          >
-            🚪 Logout
-          </button>
-        </div>
+            onClick={() => setIsOpen(false)}
+          />
+          
+          {/* Dropdown menu */}
+          <div style={{
+            position: 'absolute',
+            top: 'calc(100% + 8px)',
+            right: 0,
+            background: 'white',
+            borderRadius: 8,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+            minWidth: isMobile ? 180 : 200,
+            zIndex: 'var(--z-dropdown)',
+            border: '1px solid #e0e0e0',
+            animation: 'slideInDown 0.2s ease-out',
+          }}>
+            <div style={{
+              padding: '12px 16px',
+              borderBottom: '1px solid #f0f0f0',
+            }}>
+              <div style={{ fontWeight: 600, marginBottom: 4 }}>{user.name || 'Citizen'}</div>
+              <div style={{ color: '#666', fontSize: 13 }}>{user.phone}</div>
+            </div>
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                onLogout();
+              }}
+              data-testid="logout-button"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                background: 'none',
+                border: 'none',
+                textAlign: 'left',
+                cursor: 'pointer',
+                fontSize: 14,
+                color: '#d32f2f',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#f5f5f5';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'none';
+              }}
+            >
+              🚪 Logout
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
