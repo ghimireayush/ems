@@ -39,9 +39,9 @@ export function EventList({ onSelectEvent, isMobile }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }} data-testid="event-list">
-      {/* Search and filters - No longer sticky in web view */}
+      {/* Search and filters - Compact layout */}
       <div style={{ 
-        padding: isMobile ? '16px' : '14px 16px', 
+        padding: isMobile ? '8px 16px' : '14px 16px', 
         borderBottom: '1px solid #e8e8e8',
         background: '#fafafa',
         position: 'static',
@@ -50,9 +50,9 @@ export function EventList({ onSelectEvent, isMobile }) {
         {/* Search bar and sort dropdown on same row for mobile */}
         <div style={{
           display: 'flex',
-          gap: isMobile ? 12 : 0,
+          gap: isMobile ? 8 : 0,
           alignItems: 'center',
-          marginBottom: isMobile ? 16 : 10,
+          marginBottom: isMobile ? 6 : 10,
         }}>
           <input
             type="text"
@@ -61,14 +61,14 @@ export function EventList({ onSelectEvent, isMobile }) {
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
               flex: 1,
-              padding: isMobile ? '14px 16px' : '10px 14px',
+              padding: isMobile ? '10px 12px' : '10px 14px',
               border: '1px solid #e0e0e0',
-              borderRadius: isMobile ? 12 : 8,
+              borderRadius: isMobile ? 8 : 8,
               fontSize: 16, // Always 16px to prevent zoom on iOS
               background: 'white',
               transition: 'all 0.2s ease',
               boxSizing: 'border-box',
-              minHeight: isMobile ? 48 : 'auto',
+              minHeight: isMobile ? 40 : 'auto',
             }}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = '#667eea';
@@ -86,17 +86,17 @@ export function EventList({ onSelectEvent, isMobile }) {
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               style={{ 
-                padding: '12px 1px', 
+                padding: '6px 8px', 
                 borderRadius: 8, 
                 border: '1px solid #e0e0e0',
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 500,
                 background: 'white',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
-                flexShrink: 9,
-                minHeight: 48,
-                minWidth: 90
+                flexShrink: 0,
+                minHeight: 40,
+                minWidth: 85,
               }}
             >
               <option value="date">📅 By Date</option>
@@ -150,24 +150,23 @@ export function EventList({ onSelectEvent, isMobile }) {
               {displayEvents.length} of {totalCount}
             </span>
             
-            {Object.values(state.filters).some(v => v !== null) && (
+            {!isMobile && Object.values(state.filters).some(v => v !== null) && (
               <button
                 onClick={() => actions.clearFilters()}
                 style={{
-                  padding: isMobile ? '6px 10px' : '6px 12px',
+                  padding: '6px 12px',
                   background: '#ff5722',
                   border: 'none',
-                  borderRadius: isMobile ? 6 : 6,
-                  fontSize: isMobile ? 12 : 12,
+                  borderRadius: 6,
+                  fontSize: 12,
                   cursor: 'pointer',
                   fontWeight: 600,
                   color: 'white',
                   transition: 'all 0.2s ease',
                   flexShrink: 0,
-                  minHeight: isMobile ? 28 : 'auto',
                 }}
               >
-                {isMobile ? ' Clear' : 'Clear'}
+                Clear
               </button>
             )}
           </div>

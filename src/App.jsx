@@ -199,18 +199,36 @@ function AppContent() {
           zIndex: 'var(--z-header)',
         }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <h1 style={{ 
-            margin: 0, 
-            fontSize: isMobile ? 16 : 22, 
-            fontWeight: 700, 
-            letterSpacing: '-0.5px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: isMobile ? 6 : 10,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}>
+          <h1 
+            onClick={() => actions.clearFilters()}
+            style={{ 
+              margin: 0, 
+              fontSize: isMobile ? 16 : 22, 
+              fontWeight: 700, 
+              letterSpacing: '-0.5px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: isMobile ? 6 : 10,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              if (!isMobile) {
+                e.currentTarget.style.opacity = '0.8';
+                e.currentTarget.style.transform = 'scale(1.02)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isMobile) {
+                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.transform = 'scale(1)';
+              }
+            }}
+            title="Click to clear all filters"
+          >
             <span style={{ fontSize: isMobile ? 20 : 28 }}>🗳️</span>
             Nepal Elections 2026
           </h1>
