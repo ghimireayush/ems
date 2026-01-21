@@ -78,7 +78,7 @@ VALUES (
   2020,
   'chair',
   NULL,
-  'janata_Samajparty_Party_Nepal.png'
+  'Janata_Samajparty_Party_Nepal.png'
 );
 
 INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
