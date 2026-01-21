@@ -102,6 +102,9 @@ export default defineConfig({
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/v1')
       }
+    },
+    watch: {
+      ignored: ['**/node_modules/**', '**/dist/**', '**/test-results/**', '**/playwright-report/**']
     }
   },
   preview: {

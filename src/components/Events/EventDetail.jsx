@@ -25,7 +25,7 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
     }
   }, [event?.userRsvp]);
 
-  console.log('[EventDetail] Rendering - event.id:', event?.id, 'event.userRsvp:', event?.userRsvp, 'rsvpLoading:', rsvpLoading);
+
 
   if (!event) {
     return (
