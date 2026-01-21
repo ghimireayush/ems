@@ -374,7 +374,7 @@ async def list_events(
             }
         }
 
-@app.get("/v1/events/nearby")
+@app.get("/election/v1/events/nearby")
 async def list_events_nearby(
     lat: float = Query(...),
     lng: float = Query(...),
@@ -410,7 +410,7 @@ async def list_events_nearby(
             "radius_meters": radius
         }
 
-@app.get("/v1/events/{event_id}")
+@app.get("/election/v1/events/{event_id}")
 async def get_event(event_id: str, user: Optional[dict] = Depends(get_current_user)):
     """Get single event details with user's RSVP status."""
     with get_db() as conn:
@@ -437,7 +437,7 @@ async def get_event(event_id: str, user: Optional[dict] = Depends(get_current_us
         
         return event
 
-@app.post("/v1/events/{event_id}/rsvp")
+@app.post("/election/v1/events/{event_id}/rsvp")
 async def rsvp_event(
     event_id: str, 
     body: RsvpRequest,
@@ -482,7 +482,7 @@ async def rsvp_event(
         print(f"Error in RSVP endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=f"RSVP failed: {str(e)}")
 
-@app.delete("/v1/events/{event_id}/rsvp")
+@app.delete("/election/v1/events/{event_id}/rsvp")
 async def cancel_rsvp(event_id: str, user: dict = Depends(require_auth)):
     """Cancel RSVP - removes from database."""
     with get_db() as conn:
@@ -499,7 +499,7 @@ async def cancel_rsvp(event_id: str, user: dict = Depends(require_auth)):
 # PARTIES ENDPOINTS
 # ============================================================================
 
-@app.get("/v1/parties")
+@app.get("/election/v1/parties")
 async def list_parties():
     """List all political parties."""
     with get_db() as conn:
@@ -509,7 +509,7 @@ async def list_parties():
         
         return {"data": [row_to_party(row) for row in rows]}
 
-@app.get("/v1/parties/{party_id}")
+@app.get("/election/v1/parties/{party_id}")
 async def get_party(party_id: str):
     """Get single party details."""
     with get_db() as conn:
@@ -522,7 +522,7 @@ async def get_party(party_id: str):
         
         return row_to_party(row)
 
-@app.get("/v1/parties/{party_id}/events")
+@app.get("/election/v1/parties/{party_id}/events")
 async def list_party_events(party_id: str, page: int = 1, per_page: int = 20):
     """List events for a specific party."""
     with get_db() as conn:
@@ -560,7 +560,7 @@ async def list_party_events(party_id: str, page: int = 1, per_page: int = 20):
 # CONSTITUENCIES ENDPOINTS
 # ============================================================================
 
-@app.get("/v1/constituencies")
+@app.get("/election/v1/constituencies")
 async def list_constituencies(
     province: Optional[str] = Query(None),
     district: Optional[str] = Query(None),
@@ -593,7 +593,7 @@ async def list_constituencies(
         
         return {"data": [row_to_constituency(row) for row in rows]}
 
-@app.get("/v1/constituencies/detect")
+@app.get("/election/v1/constituencies/detect")
 async def detect_constituency(lat: float = Query(...), lng: float = Query(...)):
     """Detect constituency from coordinates using PostGIS."""
     with get_db() as conn:
@@ -617,7 +617,7 @@ async def detect_constituency(lat: float = Query(...), lng: float = Query(...)):
         
         return row_to_constituency(row)
 
-@app.get("/v1/constituencies/{constituency_id}")
+@app.get("/election/v1/constituencies/{constituency_id}")
 async def get_constituency(constituency_id: str):
     """Get single constituency details."""
     with get_db() as conn:
@@ -639,7 +639,7 @@ async def get_constituency(constituency_id: str):
         
         return row_to_constituency(row)
 
-@app.get("/v1/constituencies/{constituency_id}/events")
+@app.get("/election/v1/constituencies/{constituency_id}/events")
 async def list_constituency_events(
     constituency_id: str, 
     page: int = 1, 
@@ -681,7 +681,7 @@ async def list_constituency_events(
 # AUTH ENDPOINTS (OTP remains mock)
 # ============================================================================
 
-@app.post("/v1/auth/request-otp")
+@app.post("/election/v1/auth/request-otp")
 async def request_otp(body: OtpRequest):
     """Request OTP - MOCK: always sends 123456."""
     phone = body.phone
@@ -699,7 +699,7 @@ async def request_otp(body: OtpRequest):
         "dev_otp": otp  # For testing
     }
 
-@app.post("/v1/auth/verify-otp")
+@app.post("/election/v1/auth/verify-otp")
 async def verify_otp(body: OtpVerify):
     """Verify OTP and create/get user from DATABASE."""
     phone = body.phone
@@ -745,7 +745,7 @@ async def verify_otp(body: OtpVerify):
         }
     }
 
-@app.post("/v1/auth/refresh")
+@app.post("/election/v1/auth/refresh")
 async def refresh_token(refresh_token: str = Query(...)):
     """Refresh access token."""
     if refresh_token not in TOKENS:
@@ -780,7 +780,7 @@ async def refresh_token(refresh_token: str = Query(...)):
 # USER ENDPOINTS
 # ============================================================================
 
-@app.get("/v1/users/me")
+@app.get("/election/v1/users/me")
 async def get_me(user: dict = Depends(require_auth)):
     """Get current user profile from database."""
     return {
@@ -792,7 +792,7 @@ async def get_me(user: dict = Depends(require_auth)):
         "created_at": user["created_at"].isoformat() if user.get("created_at") else None
     }
 
-@app.patch("/v1/users/me")
+@app.patch("/election/v1/users/me")
 async def update_me(body: UserUpdate, user: dict = Depends(require_auth)):
     """Update current user profile in database."""
     with get_db() as conn:
@@ -833,7 +833,7 @@ async def update_me(body: UserUpdate, user: dict = Depends(require_auth)):
             "role": user.get("role", "citizen")
         }
 
-@app.get("/v1/users/me/rsvps")
+@app.get("/election/v1/users/me/rsvps")
 async def get_my_rsvps(user: dict = Depends(require_auth)):
     """Get current user's RSVPs from database."""
     with get_db() as conn:
@@ -861,7 +861,7 @@ async def get_my_rsvps(user: dict = Depends(require_auth)):
 # META ENDPOINTS
 # ============================================================================
 
-@app.get("/v1/meta/event-types")
+@app.get("/election/v1/meta/event-types")
 async def get_event_types():
     """Get event type definitions."""
     return {
@@ -879,7 +879,7 @@ async def get_event_types():
 # HEALTH CHECK
 # ============================================================================
 
-@app.get("/health")
+@app.get("/election/v1/health")
 async def health_check():
     """Health check with DB connectivity test."""
     try:
