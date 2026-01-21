@@ -10,7 +10,8 @@
       "leader": "Sher Bahadur Deuba",
       "founded": 1947,
       "symbol": "tree",
-      "website": "https://nepalicongress.org"
+      "website": "https://nepalicongress.org",
+      "logoUrl": "Nepali_Congress.png"
     },
     {
       "id": "uml",
@@ -22,19 +23,21 @@
       "leader": "K.P. Sharma Oli",
       "founded": 1991,
       "symbol": "sun",
-      "website": "https://cpnuml.org"
+      "website": "https://cpnuml.org",
+      "logoUrl": "cpnuml.png"
     },
     {
       "id": "maoist",
-      "name": "CPN (Maoist Centre)",
-      "nameNepali": "नेकपा (माओवादी केन्द्र)",
-      "shortName": "Maoist",
+      "name": "Nepal Communist Party",
+      "nameNepali": "नेपाल कम्युनिष्ट पार्टी",
+      "shortName": "NCP",
       "color": "#c62828",
-      "ideology": "Left, Maoist",
+      "ideology": "Left, Communist",
       "leader": "Pushpa Kamal Dahal",
       "founded": 1994,
       "symbol": "hammer-sickle",
-      "website": null
+      "website": null,
+      "logoUrl": "Nepal_Communist_Party.png"
     },
     {
       "id": "rsp",
@@ -46,7 +49,8 @@
       "leader": "Rabi Lamichhane",
       "founded": 2022,
       "symbol": "key",
-      "website": null
+      "website": null,
+      "logoUrl": "rsp.png"
     },
     {
       "id": "jsp",
@@ -58,7 +62,8 @@
       "leader": "Upendra Yadav",
       "founded": 2020,
       "symbol": "chair",
-      "website": null
+      "website": null,
+      "logoUrl": "janata_Samajparty_Party_Nepal.png"
     },
     {
       "id": "genz",
@@ -70,7 +75,8 @@
       "leader": "Kishori Karki",
       "founded": 2025,
       "symbol": "sunrise",
-      "website": null
+      "website": null,
+      "logoUrl": null
     }
   ]
 }

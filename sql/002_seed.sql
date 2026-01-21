@@ -39,16 +39,16 @@ VALUES (
 INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
 VALUES (
   'maoist',
-  'CPN (Maoist Centre)',
-  'नेकपा (माओवादी केन्द्र)',
-  'Maoist',
+  'Nepal Communist Party',
+  'नेपाल कम्युनिष्ट पार्टी',
+  'NCP',
   '#c62828',
-  'Left, Maoist',
+  'Left, Communist',
   'Pushpa Kamal Dahal',
   1994,
   'hammer-sickle',
   NULL,
-  'mao.png'
+  'Nepal_Communist_Party.png'
 );
 
 INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
@@ -321,8 +321,8 @@ VALUES (
 INSERT INTO events (id, title, title_nepali, party_id, constituency_id, venue_id, event_type, status, description, datetime, end_time, speakers, expected_attendance, rsvp_count)
 VALUES (
   'evt-004',
-  'Maoist Centre: Farmers Meet',
-  'माओवादी केन्द्र: किसान भेला',
+  'Nepal Communist Party: Farmers Meet',
+  'नेपाल कम्युनिष्ट पार्टी: किसान भेला',
   'maoist',
   'bhaktapur-1',
   '00000000-0000-0000-0000-000000000004',
