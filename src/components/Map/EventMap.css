@@ -1,0 +1,45 @@
+/* Map container isolation */
+.map-container {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  /* Prevent scroll events from bubbling up */
+  touch-action: none;
+  -ms-touch-action: none;
+}
+
+/* Leaflet map specific isolation */
+.map-container .leaflet-container {
+  /* Ensure map captures all pointer events within its bounds */
+  pointer-events: auto;
+  /* Prevent scroll propagation */
+  overscroll-behavior: contain;
+  -ms-scroll-chaining: none;
+}
+
+/* When events panel is hovered, disable map interactions */
+.map-container.disabled {
+  pointer-events: none;
+}
+
+.map-container.disabled .leaflet-container {
+  pointer-events: none;
+}
+
+/* Ensure map tiles load properly */
+.map-container .leaflet-tile-pane {
+  pointer-events: none;
+}
+
+.map-container .leaflet-control-container {
+  pointer-events: auto;
+}
+
+/* Prevent text selection on map */
+.map-container .leaflet-container {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

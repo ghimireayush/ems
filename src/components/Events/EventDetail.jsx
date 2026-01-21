@@ -76,20 +76,19 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
   return (
     <div 
       style={{ 
+        height: '100%',
+        overflow: 'auto',
         WebkitOverflowScrolling: 'touch',
       }} 
       data-testid="event-detail"
     >
-      {/* Header - Mobile optimized */}
+      {/* Header - No longer sticky in web view */}
       <div style={{ 
         padding: isMobile ? '20px 16px' : 16, 
         borderBottom: '1px solid #e0e0e0',
         background: event.party ? getPartyColor(event.party, 0.05) : '#f9f9f9',
-        position: isMobile ? 'static' : 'sticky',
-        top: isMobile ? 'auto' : 0,
-        zIndex: 100,
-        backdropFilter: isMobile ? 'none' : 'blur(10px)',
-        WebkitBackdropFilter: isMobile ? 'none' : 'blur(10px)',
+        position: 'static',
+        zIndex: 'auto',
       }}>
         <button
           onClick={() => actions.selectEvent(null)}
@@ -146,10 +145,10 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
             borderRadius: isMobile ? 12 : 8,
             border: '1px solid rgba(0,0,0,0.1)',
           }}>
-            {event.party.logoUrl && (
+            {event.party?.logoUrl && (
               <img 
                 src={`/${event.party.logoUrl}`}
-                alt={event.party.name}
+                alt={event.party?.name || 'Party logo'}
                 style={{
                   width: isMobile ? 40 : 32,
                   height: isMobile ? 40 : 32,
@@ -159,12 +158,12 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
                 }}
               />
             )}
-            {!event.party.logoUrl && (
+            {!event.party?.logoUrl && (
               <span style={{
                 display: 'inline-block',
                 width: isMobile ? 40 : 32,
                 height: isMobile ? 40 : 32,
-                background: event.party.color,
+                background: event.party?.color || '#ccc',
                 borderRadius: '50%',
                 flexShrink: 0,
               }}></span>
@@ -176,7 +175,7 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
                 display: 'block',
                 lineHeight: 1.3,
               }}>
-                {event.party.name}
+                {event.party?.name}
               </span>
               <span style={{ 
                 color: '#666', 
@@ -184,17 +183,17 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
                 display: 'block',
                 marginTop: 2,
               }}>
-                ({event.party.nameNepali})
+                ({event.party?.nameNepali})
               </span>
             </div>
           </div>
         )}
       </div>
 
-      {/* Content - Mobile optimized */}
+      {/* Content - Scrollable */}
       <div style={{ 
         padding: isMobile ? '20px 16px' : 16,
-        paddingTop: isMobile ? '8px' : 16, // Reduced top padding since header is sticky
+        paddingTop: isMobile ? '8px' : 16,
       }}>
         {/* Date & Time */}
         <Section title="When" isMobile={isMobile}>
@@ -214,23 +213,27 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
             fontSize: isMobile ? 16 : 15,
             marginBottom: 4,
           }}>
-            {event.venue.name}
+            {event.venue?.name || 'Venue TBD'}
           </div>
-          <div style={{ 
-            color: '#666', 
-            fontSize: isMobile ? 14 : 13,
-            marginBottom: 4,
-          }}>
-            {event.venue.nameNepali}
-          </div>
-          <div style={{ 
-            color: '#666', 
-            fontSize: isMobile ? 14 : 13, 
-            marginTop: 8,
-            lineHeight: 1.4,
-          }}>
-            {event.venue.address}
-          </div>
+          {event.venue?.nameNepali && (
+            <div style={{ 
+              color: '#666', 
+              fontSize: isMobile ? 14 : 13,
+              marginBottom: 4,
+            }}>
+              {event.venue.nameNepali}
+            </div>
+          )}
+          {event.venue?.address && (
+            <div style={{ 
+              color: '#666', 
+              fontSize: isMobile ? 14 : 13, 
+              marginTop: 8,
+              lineHeight: 1.4,
+            }}>
+              {event.venue.address}
+            </div>
+          )}
           
           {distance !== null && (
             <div style={{ 
@@ -252,27 +255,29 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
             gap: isMobile ? 12 : 8,
             flexWrap: 'wrap',
           }}>
-            <a
-              href={getGoogleMapsUrl(event.venue.coordinates, event.venue.name)}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                padding: isMobile ? '12px 20px' : '8px 12px',
-                background: '#1976d2',
-                color: 'white',
-                borderRadius: isMobile ? 8 : 4,
-                textDecoration: 'none',
-                fontSize: isMobile ? 15 : 13,
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                minHeight: isMobile ? 44 : 'auto',
-              }}
-            >
-              🗺️ View on Map
-            </a>
-            {location && (
+            {event.venue?.coordinates && Array.isArray(event.venue.coordinates) && event.venue.coordinates.length >= 2 && (
+              <a
+                href={getGoogleMapsUrl(event.venue.coordinates, event.venue?.name)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  padding: isMobile ? '12px 20px' : '8px 12px',
+                  background: '#1976d2',
+                  color: 'white',
+                  borderRadius: isMobile ? 8 : 4,
+                  textDecoration: 'none',
+                  fontSize: isMobile ? 15 : 13,
+                  fontWeight: 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  minHeight: isMobile ? 44 : 'auto',
+                }}
+              >
+                🗺️ View on Map
+              </a>
+            )}
+            {location && event.venue?.coordinates && Array.isArray(event.venue.coordinates) && event.venue.coordinates.length >= 2 && (
               <a
                 href={getDirectionsUrl(location, event.venue.coordinates)}
                 target="_blank"
@@ -362,7 +367,7 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
                 fontWeight: 600,
                 color: '#667eea',
               }} data-testid="rsvp-count">
-                {event.rsvpCount}
+                {event.rsvpCount || 0}
               </div>
               <div style={{ 
                 fontSize: isMobile ? 13 : 12, 
@@ -378,7 +383,7 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
                 fontWeight: 600,
                 color: '#43a047',
               }}>
-                {event.expectedAttendance?.toLocaleString()}
+                {event.expectedAttendance?.toLocaleString() || 'TBD'}
               </div>
               <div style={{ 
                 fontSize: isMobile ? 13 : 12, 
@@ -399,25 +404,25 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
               fontSize: isMobile ? 16 : 15,
               marginBottom: 4,
             }}>
-              {event.constituency.name}
+              {event.constituency?.name}
             </div>
             <div style={{ 
               color: '#666', 
               fontSize: isMobile ? 14 : 13,
               marginBottom: 4,
             }}>
-              {event.constituency.district}, {event.constituency.province}
+              {event.constituency?.district}, {event.constituency?.province}
             </div>
             <div style={{ 
               color: '#666', 
               fontSize: isMobile ? 14 : 13,
             }}>
-              {event.constituency.registeredVoters.toLocaleString()} registered voters
+              {event.constituency?.registeredVoters?.toLocaleString()} registered voters
             </div>
           </Section>
         )}
 
-        {/* RSVP Button - Mobile optimized */}
+        {/* RSVP Button - Sticky only on mobile */}
         <div style={{ 
           marginTop: isMobile ? 32 : 24,
           position: isMobile ? 'sticky' : 'static',
@@ -425,7 +430,7 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
           background: isMobile ? 'rgba(255,255,255,0.95)' : 'transparent',
           padding: isMobile ? '16px 0 16px 0' : 0,
           borderTop: isMobile ? '1px solid #e8e8e8' : 'none',
-          zIndex: 50,
+          zIndex: isMobile ? 50 : 'auto',
           backdropFilter: isMobile ? 'blur(10px)' : 'none',
           WebkitBackdropFilter: isMobile ? 'blur(10px)' : 'none',
         }}>

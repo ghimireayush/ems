@@ -39,8 +39,8 @@ VALUES (
 INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)
 VALUES (
   'maoist',
-  'Nepal Communist Party',
-  'नेपाल कम्युनिष्ट पार्टी',
+  'Nepali Communist Party',
+  'नेपाली कम्युनिष्ट पार्टी',
   'NCP',
   '#c62828',
   'Left, Communist',

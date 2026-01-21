@@ -5,6 +5,7 @@ import { useApp } from '../../context/AppContext';
 import { useEvents } from '../../hooks/useEvents';
 import { formatTime, getPartyColor, eventTypeIcons } from '../../utils/helpers';
 import 'leaflet/dist/leaflet.css';
+import './EventMap.css';
 
 // Fix default marker icon issue with webpack/vite
 delete L.Icon.Default.prototype._getIconUrl;
@@ -53,14 +54,65 @@ export function EventMap() {
   const { state, actions } = useApp();
   const { events } = useEvents();
   const { constituencies, mapCenter, mapZoom, userLocation } = state;
+  const mapContainerRef = useRef(null);
+
+  useEffect(() => {
+    const mapContainer = mapContainerRef.current;
+    if (!mapContainer) return;
+
+    // Create a global event listener to detect when mouse is over events panel
+    const handleGlobalMouseMove = (e) => {
+      const eventsPanel = document.querySelector('[data-testid="left-panel"]');
+      if (!eventsPanel) return;
+
+      const rect = eventsPanel.getBoundingClientRect();
+      const isOverEventsPanel = (
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom
+      );
+
+      // Disable/enable map interactions based on mouse position
+      if (isOverEventsPanel) {
+        mapContainer.classList.add('disabled');
+      } else {
+        mapContainer.classList.remove('disabled');
+      }
+    };
+
+    // Prevent all scroll-related events from propagating when over the map
+    const preventScrollPropagation = (e) => {
+      if (mapContainer.classList.contains('disabled')) {
+        return; // Let the event pass through when disabled
+      }
+      e.stopPropagation();
+    };
+
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+    mapContainer.addEventListener('wheel', preventScrollPropagation, { capture: true });
+    mapContainer.addEventListener('scroll', preventScrollPropagation, { capture: true });
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      mapContainer.removeEventListener('wheel', preventScrollPropagation, { capture: true });
+      mapContainer.removeEventListener('scroll', preventScrollPropagation, { capture: true });
+    };
+  }, []);
 
   return (
-    <div style={{ height: '100%', width: '100%' }}>
+    <div 
+      ref={mapContainerRef}
+      className="map-container"
+    >
       <MapContainer
         center={mapCenter}
         zoom={mapZoom}
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={true}
+        doubleClickZoom={true}
+        touchZoom={true}
+        dragging={true}
       >
         <MapController center={mapCenter} zoom={mapZoom} />
         

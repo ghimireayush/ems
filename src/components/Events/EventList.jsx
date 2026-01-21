@@ -39,41 +39,71 @@ export function EventList({ onSelectEvent, isMobile }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }} data-testid="event-list">
-      {/* Search and filters - Mobile optimized */}
+      {/* Search and filters - No longer sticky in web view */}
       <div style={{ 
         padding: isMobile ? '16px' : '14px 16px', 
         borderBottom: '1px solid #e8e8e8',
         background: '#fafafa',
-        position: isMobile ? 'static' : 'sticky',
-        top: isMobile ? 'auto' : 0,
-        zIndex: 'var(--z-content)',
+        position: 'static',
+        zIndex: 'auto',
       }}>
-        <input
-          type="text"
-          placeholder={isMobile ? "Search events..." : "Search events..."}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            width: '100%',
-            padding: isMobile ? '14px 16px' : '10px 14px',
-            border: '1px solid #e0e0e0',
-            borderRadius: isMobile ? 12 : 8,
-            fontSize: 16, // Always 16px to prevent zoom on iOS
-            marginBottom: isMobile ? 16 : 10,
-            background: 'white',
-            transition: 'all 0.2s ease',
-            boxSizing: 'border-box',
-            minHeight: isMobile ? 48 : 'auto',
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = '#667eea';
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = '#e0e0e0';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
-        />
+        {/* Search bar and sort dropdown on same row for mobile */}
+        <div style={{
+          display: 'flex',
+          gap: isMobile ? 12 : 0,
+          alignItems: 'center',
+          marginBottom: isMobile ? 16 : 10,
+        }}>
+          <input
+            type="text"
+            placeholder={isMobile ? "Search events..." : "Search events..."}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              flex: 1,
+              padding: isMobile ? '14px 16px' : '10px 14px',
+              border: '1px solid #e0e0e0',
+              borderRadius: isMobile ? 12 : 8,
+              fontSize: 16, // Always 16px to prevent zoom on iOS
+              background: 'white',
+              transition: 'all 0.2s ease',
+              boxSizing: 'border-box',
+              minHeight: isMobile ? 48 : 'auto',
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = '#667eea';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = '#e0e0e0';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          />
+          
+          {/* Sort dropdown - next to search on mobile */}
+          {isMobile && (
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{ 
+                padding: '12px 1px', 
+                borderRadius: 8, 
+                border: '1px solid #e0e0e0',
+                fontSize: 12,
+                fontWeight: 500,
+                background: 'white',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                flexShrink: 9,
+                minHeight: 48,
+                minWidth: 90
+              }}
+            >
+              <option value="date">📅 By Date</option>
+              <option value="distance" disabled={!location}>📍 By Distance</option>
+            </select>
+          )}
+        </div>
         
         <div style={{ 
           display: 'flex', 
@@ -82,25 +112,27 @@ export function EventList({ onSelectEvent, isMobile }) {
           flexWrap: isMobile ? 'wrap' : 'nowrap',
           justifyContent: 'space-between',
         }}>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            style={{ 
-              padding: isMobile ? '12px 16px' : '8px 10px', 
-              borderRadius: isMobile ? 8 : 6, 
-              border: '1px solid #e0e0e0',
-              fontSize: isMobile ? 15 : 13,
-              fontWeight: 500,
-              background: 'white',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              flexShrink: 0,
-              minHeight: isMobile ? 44 : 'auto',
-            }}
-          >
-            <option value="date">{isMobile ? '📅 By Date' : 'Sort by Date'}</option>
-            <option value="distance" disabled={!location}>{isMobile ? '📍 By Distance' : 'Sort by Distance'}</option>
-          </select>
+          {/* Sort dropdown for desktop only */}
+          {!isMobile && (
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{ 
+                padding: '8px 10px', 
+                borderRadius: 6, 
+                border: '1px solid #e0e0e0',
+                fontSize: 13,
+                fontWeight: 500,
+                background: 'white',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                flexShrink: 0,
+              }}
+            >
+              <option value="date">Sort by Date</option>
+              <option value="distance" disabled={!location}>Sort by Distance</option>
+            </select>
+          )}
           
           <div style={{ 
             display: 'flex',
@@ -113,6 +145,7 @@ export function EventList({ onSelectEvent, isMobile }) {
               color: '#999',
               fontWeight: 500,
               whiteSpace: 'nowrap',
+              display: isMobile ? 'none' : 'inline',
             }}>
               {displayEvents.length} of {totalCount}
             </span>
@@ -121,27 +154,27 @@ export function EventList({ onSelectEvent, isMobile }) {
               <button
                 onClick={() => actions.clearFilters()}
                 style={{
-                  padding: isMobile ? '10px 16px' : '6px 12px',
+                  padding: isMobile ? '6px 10px' : '6px 12px',
                   background: '#ff5722',
                   border: 'none',
-                  borderRadius: isMobile ? 8 : 6,
-                  fontSize: isMobile ? 14 : 12,
+                  borderRadius: isMobile ? 6 : 6,
+                  fontSize: isMobile ? 12 : 12,
                   cursor: 'pointer',
                   fontWeight: 600,
                   color: 'white',
                   transition: 'all 0.2s ease',
                   flexShrink: 0,
-                  minHeight: isMobile ? 40 : 'auto',
+                  minHeight: isMobile ? 28 : 'auto',
                 }}
               >
-                {isMobile ? '🗑️ Clear' : 'Clear'}
+                {isMobile ? ' Clear' : 'Clear'}
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Event list - Mobile optimized scrolling */}
+      {/* Event list - Scrollable */}
       <div 
         style={{ 
           WebkitOverflowScrolling: 'touch',
@@ -155,13 +188,13 @@ export function EventList({ onSelectEvent, isMobile }) {
                 background: '#f8f9fa',
                 fontWeight: 600,
                 fontSize: isMobile ? 13 : 12,
-                position: 'sticky',
-                top: 0,
+                position: isMobile ? 'sticky' : 'static',
+                top: isMobile ? 0 : 'auto',
                 borderBottom: '1px solid #e8e8e8',
                 color: '#667eea',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px',
-                zIndex: 5,
+                zIndex: isMobile ? 5 : 'auto',
               }}>
                 {getRelativeDate(group.date)} — {formatDate(group.date, { 
                   weekday: isMobile ? 'short' : 'long', 

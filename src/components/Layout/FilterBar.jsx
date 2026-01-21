@@ -9,13 +9,13 @@ export function FilterBar({ isMobile }) {
   const mobileStyles = {
     padding: isMobile ? '12px 16px' : '12px 16px',
     background: 'white',
-    borderBottom: '1px solid #e8e8e8',
+    borderBottom: isMobile ? '1px solid #e8e8e8' : 'none',
     display: 'flex',
     flexDirection: 'row', // Always horizontal
     gap: isMobile ? 6 : 10,
     alignItems: 'center',
     flexWrap: 'nowrap',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)',
+    boxShadow: isMobile ? '0 2px 4px rgba(0, 0, 0, 0.04)' : 'none',
     position: 'relative',
     zIndex: 'var(--z-content)',
     overflowX: isMobile ? 'auto' : 'visible',

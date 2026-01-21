@@ -1,6 +1,9 @@
 // Date formatting utilities
 export function formatDate(dateString, options = {}) {
+  if (!dateString) return 'Date TBD';
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Date TBD';
+  
   const defaultOptions = {
     weekday: 'short',
     month: 'short',
@@ -10,7 +13,10 @@ export function formatDate(dateString, options = {}) {
 }
 
 export function formatTime(dateString) {
+  if (!dateString) return 'Time TBD';
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Time TBD';
+  
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
@@ -19,12 +25,24 @@ export function formatTime(dateString) {
 }
 
 export function formatDateTime(dateString) {
+  if (!dateString) return 'Date & Time TBD';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Date & Time TBD';
+  
   return `${formatDate(dateString)} at ${formatTime(dateString)}`;
 }
 
 export function formatDateRange(start, end) {
+  if (!start && !end) return 'Date & Time TBD';
+  if (!start) return formatDateTime(end);
+  if (!end) return formatDateTime(start);
+  
   const startDate = new Date(start);
   const endDate = new Date(end);
+  
+  if (isNaN(startDate.getTime()) && isNaN(endDate.getTime())) return 'Date & Time TBD';
+  if (isNaN(startDate.getTime())) return formatDateTime(end);
+  if (isNaN(endDate.getTime())) return formatDateTime(start);
   
   if (startDate.toDateString() === endDate.toDateString()) {
     return `${formatDate(start)}, ${formatTime(start)} - ${formatTime(end)}`;
@@ -97,11 +115,18 @@ export function searchEvents(events, query) {
 
 // URL utilities
 export function getGoogleMapsUrl(coordinates, label) {
+  if (!coordinates || !Array.isArray(coordinates) || coordinates.length < 2) {
+    return '#';
+  }
   const [lat, lng] = coordinates;
   return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 }
 
 export function getDirectionsUrl(from, to) {
+  if (!from || !Array.isArray(from) || from.length < 2 || 
+      !to || !Array.isArray(to) || to.length < 2) {
+    return '#';
+  }
   const [fromLat, fromLng] = from;
   const [toLat, toLng] = to;
   return `https://www.google.com/maps/dir/${fromLat},${fromLng}/${toLat},${toLng}`;

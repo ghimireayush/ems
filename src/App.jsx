@@ -276,8 +276,19 @@ function AppContent() {
         </div>
       </header>
 
-      {/* Filter bar */}
-      <FilterBar isMobile={isMobile} />
+      {/* Filter bar - Sticky on web */}
+      <div style={{
+        position: isMobile ? 'static' : 'sticky',
+        top: 0,
+        zIndex: 'var(--z-sticky)',
+        background: 'white',
+        borderBottom: '1px solid #e8e8e8',
+        boxShadow: isMobile ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.04)',
+        backdropFilter: isMobile ? 'none' : 'blur(10px)',
+        WebkitBackdropFilter: isMobile ? 'none' : 'blur(10px)',
+      }}>
+        <FilterBar isMobile={isMobile} />
+      </div>
 
       {/* Main content */}
       <div style={{
@@ -286,6 +297,7 @@ function AppContent() {
         flexDirection: isMobile ? 'column' : 'row',
         overflow: isMobile ? 'visible' : 'hidden',
         gap: isMobile ? 0 : 0,
+        minHeight: isMobile ? 'auto' : 0,
       }}>
       {isMobile ? (
         /* Mobile Layout - Natural scrolling */
@@ -426,6 +438,7 @@ function AppContent() {
           display: 'flex',
           overflow: 'hidden',
           gap: 0,
+          height: isMobile ? 'auto' : 'calc(100vh - 120px)', // More accurate calculation for header + filter bar
         }}>
           {/* Left panel - List/Detail */}
           <div 
@@ -437,10 +450,17 @@ function AppContent() {
               background: 'white',
               boxShadow: '2px 0 12px rgba(0, 0, 0, 0.08)',
               zIndex: 'var(--z-content)',
-            }}>
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
             
             {/* Panel content - Show list or detail based on selection */}
-            <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div style={{ 
+              flex: 1, 
+              overflow: 'auto',
+              WebkitOverflowScrolling: 'touch',
+            }}>
               {state.selectedEvent ? (
                 <EventDetail 
                   user={user} 
@@ -452,9 +472,20 @@ function AppContent() {
             </div>
           </div>
 
-          {/* Right panel - Map */}
-          <div style={{ flex: 1, position: 'relative' }}>
-            <EventMap />
+          {/* Right panel - Map (Sticky container) */}
+          <div style={{ 
+            flex: 1, 
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'sticky',
+              top: 0,
+              height: 'calc(100vh - 120px)', // Match the container height
+              overflow: 'hidden',
+            }}>
+              <EventMap />
+            </div>
           </div>
         </div>
       )}
