@@ -399,7 +399,7 @@ function generateSeed() {
   // ----------------------------------------------------------------------------
   lines.push('-- Parties');
   for (const party of partiesData.parties) {
-    lines.push(`INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website)`);
+    lines.push(`INSERT INTO parties (id, name, name_nepali, short_name, color, ideology, leader, founded, symbol, website, logo_url)`);
     lines.push(`VALUES (`);
     lines.push(`  ${escapeSQL(party.id)},`);
     lines.push(`  ${escapeSQL(party.name)},`);
@@ -410,7 +410,8 @@ function generateSeed() {
     lines.push(`  ${escapeSQL(party.leader)},`);
     lines.push(`  ${escapeSQL(party.founded)},`);
     lines.push(`  ${escapeSQL(party.symbol)},`);
-    lines.push(`  ${escapeSQL(party.website)}`);
+    lines.push(`  ${escapeSQL(party.website)},`);
+    lines.push(`  ${escapeSQL(party.logoUrl)}`);
     lines.push(`);`);
     lines.push('');
   }
