@@ -1,0 +1,9 @@
+# Netlify redirects for SPA routing
+# This ensures all routes are handled by the React app
+
+/*    /index.html   200
+
+# API proxy (optional - if you want to proxy API calls through Netlify)
+# /api/*  https://dev.kaha.com.np/election/v1/:splat  200
+
+# Security headers are handled in netlify.toml

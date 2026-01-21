@@ -75,10 +75,7 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
 
   return (
     <div 
-      className={isMobile ? 'mobile-scroll' : ''}
       style={{ 
-        height: '100%', 
-        overflowY: 'auto',
         WebkitOverflowScrolling: 'touch',
       }} 
       data-testid="event-detail"
@@ -88,11 +85,11 @@ export function EventDetail({ user, onLoginRequired, isMobile }) {
         padding: isMobile ? '20px 16px' : 16, 
         borderBottom: '1px solid #e0e0e0',
         background: event.party ? getPartyColor(event.party, 0.05) : '#f9f9f9',
-        position: 'sticky',
-        top: 0,
+        position: isMobile ? 'static' : 'sticky',
+        top: isMobile ? 'auto' : 0,
         zIndex: 100,
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
+        backdropFilter: isMobile ? 'none' : 'blur(10px)',
+        WebkitBackdropFilter: isMobile ? 'none' : 'blur(10px)',
       }}>
         <button
           onClick={() => actions.selectEvent(null)}

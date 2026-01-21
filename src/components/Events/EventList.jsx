@@ -38,14 +38,14 @@ export function EventList({ onSelectEvent, isMobile }) {
   };
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }} data-testid="event-list">
+    <div style={{ display: 'flex', flexDirection: 'column' }} data-testid="event-list">
       {/* Search and filters - Mobile optimized */}
       <div style={{ 
         padding: isMobile ? '16px' : '14px 16px', 
         borderBottom: '1px solid #e8e8e8',
         background: '#fafafa',
-        position: 'sticky',
-        top: 0,
+        position: isMobile ? 'static' : 'sticky',
+        top: isMobile ? 'auto' : 0,
         zIndex: 'var(--z-content)',
       }}>
         <input
@@ -143,10 +143,7 @@ export function EventList({ onSelectEvent, isMobile }) {
 
       {/* Event list - Mobile optimized scrolling */}
       <div 
-        className={isMobile ? 'mobile-scroll' : ''}
         style={{ 
-          flex: 1, 
-          overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
         }}
       >
@@ -205,7 +202,6 @@ export function EventList({ onSelectEvent, isMobile }) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            height: '100%',
             minHeight: isMobile ? 200 : 'auto',
           }}>
             <div style={{ fontSize: isMobile ? 48 : 40, marginBottom: 16 }}>🔍</div>

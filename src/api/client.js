@@ -10,7 +10,7 @@
 // ============================================================================
 
 const CONFIG = {
-  baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000/v1',
+  baseUrl: import.meta.env.VITE_API_URL || 'https://dev.kaha.com.np/election/v1',
   timeout: 10000,
   tokenKey: 'nepal_elections_token',
   refreshTokenKey: 'nepal_elections_refresh_token',

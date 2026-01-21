@@ -177,7 +177,7 @@ function AppContent() {
 
   return (
     <div style={{
-      height: '100vh',
+      minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: 'inherit',
@@ -280,22 +280,21 @@ function AppContent() {
       <FilterBar isMobile={isMobile} />
 
       {/* Main content */}
+      <div style={{
+        flex: isMobile ? 'none' : 1,
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        overflow: isMobile ? 'visible' : 'hidden',
+        gap: isMobile ? 0 : 0,
+      }}>
       {isMobile ? (
-        /* Mobile Layout - Optimized for performance and UX */
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        }}>
-          {/* Mobile view toggle - Sticky and optimized */}
+        /* Mobile Layout - Natural scrolling */
+        <>
+          {/* Mobile view toggle - Non-sticky for better scrolling */}
           <div style={{
             display: 'flex',
             background: 'white',
             borderBottom: '1px solid #e8e8e8',
-            position: 'sticky',
-            top: 0,
-            zIndex: 'var(--z-content)',
             boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
           }}>
             <button
@@ -360,46 +359,26 @@ function AppContent() {
             </button>
           </div>
 
-          {/* Mobile content with optimized transitions */}
-          <div style={{ 
-            flex: 1, 
-            position: 'relative',
-            overflow: 'hidden',
-          }}>
+          {/* Mobile content with natural scrolling */}
+          <div>
             {mobileView === 'list' ? (
-              <div 
-                className="mobile-scroll"
-                style={{ 
-                  height: '100%',
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  background: 'white',
-                }}
-              >
-                {/* Show event list or detail based on selection */}
-                <div 
-                  className="mobile-scroll"
-                  style={{ 
-                    flex: 1, 
-                    overflow: 'auto',
-                    background: 'white',
-                    WebkitOverflowScrolling: 'touch',
-                  }}
-                >
-                  {state.selectedEvent ? (
-                    <EventDetail 
-                      user={user} 
-                      onLoginRequired={() => setShowLogin(true)}
-                      isMobile={isMobile}
-                    />
-                  ) : (
-                    <EventList onSelectEvent={handleEventSelect} isMobile={isMobile} />
-                  )}
-                </div>
+              <div style={{ 
+                background: 'white',
+              }}>
+                {state.selectedEvent ? (
+                  <EventDetail 
+                    user={user} 
+                    onLoginRequired={() => setShowLogin(true)}
+                    isMobile={isMobile}
+                  />
+                ) : (
+                  <EventList onSelectEvent={handleEventSelect} isMobile={isMobile} />
+                )}
               </div>
             ) : (
               <div style={{ 
-                height: '100%',
+                height: '70vh', // Use viewport height that works better with natural scrolling
+                minHeight: '400px', // Ensure minimum usable height
                 position: 'relative',
                 background: '#f5f5f5',
               }}>
@@ -439,7 +418,7 @@ function AppContent() {
               </div>
             )}
           </div>
-        </div>
+        </>
       ) : (
         /* Desktop Layout - Side by side */
         <div style={{
@@ -479,8 +458,7 @@ function AppContent() {
           </div>
         </div>
       )}
-
-      
+      </div>
 
       {/* Login Modal */}
       <div data-testid="login-modal-container">

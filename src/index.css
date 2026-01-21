@@ -231,6 +231,43 @@ button:disabled {
   border: none;
 }
 
+/* Mobile-specific Leaflet optimizations */
+@media screen and (max-width: 768px) {
+  .leaflet-container {
+    /* Ensure proper touch handling on mobile */
+    touch-action: pan-x pan-y;
+    /* Improve rendering performance */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    /* Fix potential scrolling issues */
+    position: relative;
+  }
+  
+  /* Larger touch targets for mobile controls */
+  .leaflet-control-zoom a {
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 18px !important;
+  }
+  
+  /* Better popup sizing for mobile */
+  .leaflet-popup-content-wrapper {
+    max-width: calc(100vw - 40px) !important;
+  }
+  
+  .leaflet-popup-content {
+    margin: 16px !important;
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+  
+  /* Improve marker visibility on mobile */
+  .custom-marker div {
+    transform: scale(1.2) !important;
+  }
+}
+
 /* ============================================
    SCROLLBAR STYLING
    ============================================ */
@@ -325,6 +362,12 @@ button:disabled {
   .mobile-scroll {
     scrollbar-width: none;
     -ms-overflow-style: none;
+    /* Ensure smooth scrolling on mobile */
+    scroll-behavior: smooth;
+    /* Fix iOS momentum scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent scroll chaining */
+    overscroll-behavior: contain;
   }
   
   .mobile-scroll::-webkit-scrollbar {
