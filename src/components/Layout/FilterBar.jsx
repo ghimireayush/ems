@@ -1,6 +1,5 @@
 import { useApp } from '../../context/AppContext';
 import { useGeolocation } from '../../hooks/useGeolocation';
-import { getPartyColor } from '../../utils/helpers';
 
 export function FilterBar({ isMobile }) {
   const { state, actions } = useApp();

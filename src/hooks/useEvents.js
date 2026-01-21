@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 
 export function useEvents() {
-  const { state } = useApp();
-  const { events, filters, parties, constituencies } = state;
+  const context = useApp();
+  const { state } = context || { state: {} };
+  const { events = [], filters = {}, parties = [], constituencies = [] } = state;
 
   // Filtered events based on current filters
   const filteredEvents = useMemo(() => {

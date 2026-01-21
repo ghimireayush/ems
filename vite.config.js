@@ -88,10 +88,30 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    host: true
+    host: true,
+    cors: {
+      origin: true,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5012',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/v1')
+      }
+    }
   },
   preview: {
     port: 4173,
-    host: true
+    host: true,
+    cors: {
+      origin: true,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    }
   }
 })

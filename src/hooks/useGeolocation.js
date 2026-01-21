@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 
 export function useGeolocation() {
-  const { state, actions } = useApp();
+  const context = useApp();
+  const { state, actions } = context || { state: {}, actions: {} };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -18,7 +19,9 @@ export function useGeolocation() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const coords = [position.coords.latitude, position.coords.longitude];
-        actions.setUserLocation(coords);
+        if (actions.setUserLocation) {
+          actions.setUserLocation(coords);
+        }
         setLoading(false);
       },
       (err) => {
@@ -52,7 +55,7 @@ export function useGeolocation() {
 
   // Get events sorted by distance from user
   const sortByDistance = useCallback((events) => {
-    if (!state.userLocation) return events;
+    if (!state?.userLocation) return events;
 
     return [...events]
       .map(event => ({
@@ -66,11 +69,11 @@ export function useGeolocation() {
         if (b.distance === null) return -1;
         return a.distance - b.distance;
       });
-  }, [state.userLocation, getDistance]);
+  }, [state?.userLocation, getDistance]);
 
   return {
-    location: state.userLocation,
-    constituency: state.userConstituency,
+    location: state?.userLocation || null,
+    constituency: state?.userConstituency || null,
     loading,
     error,
     requestLocation,
