@@ -276,7 +276,7 @@ def row_to_constituency(row: dict) -> dict:
 # EVENTS ENDPOINTS
 # ============================================================================
 
-@app.get("/v1/events")
+@app.get("/election/v1/events")
 async def list_events(
     constituency_id: Optional[str] = Query(None),
     party_id: Optional[str] = Query(None),
