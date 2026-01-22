@@ -6,6 +6,7 @@ import { EventDetail } from './components/Events/EventDetail';
 import { FilterBar } from './components/Layout/FilterBar';
 import { LoginModal, UserMenu } from './components/Auth/Login';
 import { dataProvider } from './api/dataProvider';
+import { usePWAInstall } from './hooks/usePWAInstall';
 import PWAUpdatePrompt from './components/PWAUpdatePrompt';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import OfflineIndicator from './components/OfflineIndicator';
@@ -16,6 +17,7 @@ function AppContent() {
   const [user, setUser] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [mobileView, setMobileView] = useState('list'); // 'list' | 'map'
+  const { isInstallable, isInstalled, promptInstall } = usePWAInstall();
 
   useEffect(() => {
     const storedUser = dataProvider.auth.getUser?.();
@@ -58,6 +60,13 @@ function AppContent() {
   const handleLogout = () => {
     dataProvider.auth.logout();
     setUser(null);
+  };
+
+  const handleInstallClick = async () => {
+    const { outcome } = await promptInstall();
+    if (outcome === 'accepted') {
+      console.log('App installation accepted');
+    }
   };
 
   // Loading state
@@ -258,6 +267,42 @@ function AppContent() {
               <span></span>
               March 5, 2026
             </div>
+          )}
+          
+          {/* Install Button - Display it it is not installed on both mobile and web */}
+          {isInstallable && !isInstalled && (
+            <button
+              onClick={handleInstallClick}
+              data-testid="install-button"
+              style={{
+                padding: isMobile ? '8px 12px' : '10px 16px',
+                background: 'rgba(255,255,255,0.2)',
+                border: '1px solid rgba(255,255,255,0.4)',
+                borderRadius: 8,
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: isMobile ? 13 : 14,
+                fontWeight: 600,
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.3s ease',
+                whiteSpace: 'nowrap',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <span>Download</span>
+              {!isMobile && 'App'}
+              </button>
+            
           )}
           
           {user ? (
